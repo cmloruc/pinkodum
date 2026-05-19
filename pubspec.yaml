@@ -34,6 +34,12 @@ dependencies:
   # IAP
   in_app_purchase: ^3.2.0
 
+  # PDF
+  pdf: ^3.10.8
+  printing: ^5.13.1
+  share_plus: ^9.0.0
+  path_provider: ^2.1.2
+
   # Utils
   intl: ^0.20.2
   uuid: ^4.4.0

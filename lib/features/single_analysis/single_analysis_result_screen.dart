@@ -12,6 +12,7 @@ import '../../core/widgets/pin_code_tree.dart';
 import '../../data/models/element_balance.dart';
 import '../../data/models/person_analysis.dart';
 import '../../data/repositories/repository_provider.dart';
+import '../../data/services/pdf_service.dart';
 
 class SingleAnalysisResultScreen extends StatefulWidget {
   final PersonAnalysis analysis;
@@ -24,6 +25,8 @@ class SingleAnalysisResultScreen extends StatefulWidget {
 
 class _SingleAnalysisResultScreenState
     extends State<SingleAnalysisResultScreen> {
+  bool _sharing = false;
+
   @override
   void initState() {
     super.initState();
@@ -31,6 +34,17 @@ class _SingleAnalysisResultScreenState
       final repo = await getRepository();
       await repo.savePersonAnalysis(widget.analysis);
     });
+  }
+
+  Future<void> _sharePdf() async {
+    if (_sharing) return;
+    setState(() => _sharing = true);
+    try {
+      final file = await PdfService.generatePersonAnalysis(widget.analysis);
+      await PdfService.share(file, subject: 'Pin Kodum — ${widget.analysis.name}');
+    } finally {
+      if (mounted) setState(() => _sharing = false);
+    }
   }
 
   @override
@@ -43,7 +57,7 @@ class _SingleAnalysisResultScreenState
         child: SafeArea(
           child: Column(
             children: [
-              _ResultAppBar(name: a.name),
+              _ResultAppBar(name: a.name, onShare: _sharePdf, sharing: _sharing),
               Expanded(
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
@@ -103,7 +117,9 @@ class _SingleAnalysisResultScreenState
 
 class _ResultAppBar extends StatelessWidget {
   final String name;
-  const _ResultAppBar({required this.name});
+  final VoidCallback onShare;
+  final bool sharing;
+  const _ResultAppBar({required this.name, required this.onShare, required this.sharing});
 
   @override
   Widget build(BuildContext context) {
@@ -123,6 +139,16 @@ class _ResultAppBar extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
           ),
+          sharing
+              ? const SizedBox(
+                  width: 20, height: 20,
+                  child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.gold))
+              : IconButton(
+                  icon: const Icon(Icons.picture_as_pdf_outlined,
+                      size: 20, color: AppColors.gold),
+                  onPressed: onShare,
+                  tooltip: 'PDF Rapor',
+                ),
           const HomeButton(),
         ],
       ),
