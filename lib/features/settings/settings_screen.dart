@@ -30,6 +30,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   String? _saveStatus;
   AuthUser? _authUser;
   bool _loggingOut = false;
+  int _devTapCount = 0;
+  bool _devModeUnlocked = false;
 
   @override
   void initState() {
@@ -54,6 +56,31 @@ class _SettingsScreenState extends State<SettingsScreen> {
       }
     } catch (_) {
       if (mounted) setState(() => _apiKeyLoaded = true);
+    }
+  }
+
+  void _onVersionTap() {
+    _devTapCount++;
+    if (_devTapCount >= 5 && !_devModeUnlocked) {
+      setState(() => _devModeUnlocked = true);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Geliştirici modu aktif'),
+          backgroundColor: AppColors.surface,
+          duration: Duration(seconds: 2),
+        ),
+      );
+    } else if (!_devModeUnlocked) {
+      final kalan = 5 - _devTapCount;
+      if (kalan <= 3) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Geliştirici moduna $kalan adım kaldı'),
+            backgroundColor: AppColors.surface,
+            duration: const Duration(seconds: 1),
+          ),
+        );
+      }
     }
   }
 
@@ -216,27 +243,28 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               ),
                             ),
                       const SizedBox(height: 24),
-                      // ── AI API Bölümü ─────────────────────────────────
-                      _SectionHeader('AI API'),
-                      const SizedBox(height: 8),
-                      if (!_apiKeyLoaded)
-                        const Center(
-                          child:
-                              CircularProgressIndicator(color: AppColors.gold),
-                        )
-                      else
-                        _ApiKeySection(
-                          controller: _apiKeyController,
-                          selectedProvider: _selectedProvider,
-                          selectedModel: _selectedModel,
-                          onProviderChanged: _changeProvider,
-                          onModelChanged: (m) =>
-                              setState(() => _selectedModel = m!),
-                          onSave: _saveApiKey,
-                          saving: _saving,
-                          saveStatus: _saveStatus,
-                        ),
-                      const SizedBox(height: 24),
+                      // ── AI API Bölümü (yalnızca geliştirici modunda) ──
+                      if (_devModeUnlocked) ...[
+                        _SectionHeader('AI API (Geliştirici)'),
+                        const SizedBox(height: 8),
+                        if (!_apiKeyLoaded)
+                          const Center(
+                            child: CircularProgressIndicator(color: AppColors.gold),
+                          )
+                        else
+                          _ApiKeySection(
+                            controller: _apiKeyController,
+                            selectedProvider: _selectedProvider,
+                            selectedModel: _selectedModel,
+                            onProviderChanged: _changeProvider,
+                            onModelChanged: (m) =>
+                                setState(() => _selectedModel = m!),
+                            onSave: _saveApiKey,
+                            saving: _saving,
+                            saveStatus: _saveStatus,
+                          ),
+                        const SizedBox(height: 24),
+                      ],
                       _SectionHeader('Tercihler'),
                       const SizedBox(height: 12),
                       GradientCard(
@@ -329,8 +357,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             Text('Pin Kodum',
                                 style: AppTextStyles.headlineMedium),
                             const SizedBox(height: 4),
-                            Text(AppStrings.settingsVersion,
-                                style: AppTextStyles.bodySmall),
+                            GestureDetector(
+                              onTap: _onVersionTap,
+                              child: Text(AppStrings.settingsVersion,
+                                  style: AppTextStyles.bodySmall),
+                            ),
                           ],
                         ),
                       ),
