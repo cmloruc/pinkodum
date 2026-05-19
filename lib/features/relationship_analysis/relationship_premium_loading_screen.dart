@@ -5,7 +5,7 @@ import '../../app/router.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_text_styles.dart';
 import '../../data/models/relationship_analysis.dart';
-import '../../data/repositories/local_analysis_repository.dart';
+import '../../data/repositories/repository_provider.dart';
 import '../../data/services/ai_analysis_service.dart';
 import '../../data/services/api_key_service.dart';
 
@@ -51,7 +51,7 @@ class _RelationshipPremiumLoadingScreenState
 
   void _rotateMessages() {
     Future.delayed(const Duration(milliseconds: 1800), () {
-      if (mounted && _started) {
+      if (mounted) {
         setState(() => _messageIndex = (_messageIndex + 1) % _messages.length);
         _rotateMessages();
       }
@@ -65,12 +65,6 @@ class _RelationshipPremiumLoadingScreenState
       final keyService = ApiKeyService(prefs);
       final a = widget.analysis;
 
-      if (!keyService.hasApiKey) {
-        throw Exception(
-          'API anahtarı bulunamadı. Ayarlardan Claude veya OpenAI anahtarı gir.',
-        );
-      }
-
       final aiService = AiAnalysisService(keyService: keyService);
       final premium = await aiService.analyzeRelationshipPremium(
         firstName: a.firstName,
@@ -80,7 +74,7 @@ class _RelationshipPremiumLoadingScreenState
         relationshipType: a.relationshipType,
       );
 
-      final repo = LocalAnalysisRepository(prefs);
+      final repo = await getRepository();
       await repo.saveRelationshipPremiumAnalysis(premium);
       await repo.deleteRelationshipAnalysis(widget.analysis.id);
 

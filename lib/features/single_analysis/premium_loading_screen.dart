@@ -5,7 +5,7 @@ import '../../app/router.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_text_styles.dart';
 import '../../data/models/person_analysis.dart';
-import '../../data/repositories/local_analysis_repository.dart';
+import '../../data/repositories/repository_provider.dart';
 import '../../data/services/ai_analysis_service.dart';
 import '../../data/services/api_key_service.dart';
 
@@ -55,7 +55,7 @@ class _PremiumLoadingScreenState extends State<PremiumLoadingScreen>
 
   void _rotateMessages() {
     Future.delayed(const Duration(milliseconds: 1800), () {
-      if (mounted && _started) {
+      if (mounted) {
         setState(() => _messageIndex = (_messageIndex + 1) % _messages.length);
         _rotateMessages();
       }
@@ -68,19 +68,13 @@ class _PremiumLoadingScreenState extends State<PremiumLoadingScreen>
       final prefs = await SharedPreferences.getInstance();
       final keyService = ApiKeyService(prefs);
 
-      if (!keyService.hasApiKey) {
-        throw Exception(
-          'API anahtarı bulunamadı. Ayarlardan Claude veya OpenAI anahtarı gir.',
-        );
-      }
-
       final aiService = AiAnalysisService(keyService: keyService);
       final premium = await aiService.analyzePremium(
         name: widget.analysis.name,
         birthDate: widget.analysis.birthDate,
       );
 
-      final repo = LocalAnalysisRepository(prefs);
+      final repo = await getRepository();
       await repo.savePremiumAnalysis(premium);
       await repo.deletePersonAnalysis(widget.analysis.id);
 

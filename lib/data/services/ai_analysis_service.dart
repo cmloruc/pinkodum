@@ -47,11 +47,6 @@ class AiAnalysisService implements AnalysisService {
     final birthDateStr =
         '${birthDate.day}.${birthDate.month}.${birthDate.year}';
 
-    if (!_keyService.hasApiKey) {
-      throw Exception(
-          'API anahtarı bulunamadı. Ayarlardan Claude veya OpenAI anahtarı gir.');
-    }
-
     try {
       final userPrompt = PromptBuilder.singleAnalysis(
         name: name,
@@ -94,11 +89,6 @@ class AiAnalysisService implements AnalysisService {
     final elem1 = _elementCalc.calculate(pin1);
     final elem2 = _elementCalc.calculate(pin2);
     final elemCombined = _elementCalc.calculate(combined);
-
-    if (!_keyService.hasApiKey) {
-      throw Exception(
-          'API anahtarı bulunamadı. Ayarlardan Claude veya OpenAI anahtarı gir.');
-    }
 
     final includeSexual =
         MockAnalysisData.showSexualCompatibility(relationshipType);
