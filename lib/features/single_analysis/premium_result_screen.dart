@@ -5,6 +5,7 @@ import '../../core/constants/app_text_styles.dart';
 import '../../core/widgets/home_button.dart';
 import '../../core/widgets/pin_code_tree.dart';
 import '../../data/models/person_premium_analysis.dart';
+import '../../data/repositories/repository_provider.dart';
 import '../../data/services/element_balance_calculator.dart';
 
 class PremiumResultScreen extends StatefulWidget {
@@ -16,6 +17,15 @@ class PremiumResultScreen extends StatefulWidget {
 }
 
 class _PremiumResultScreenState extends State<PremiumResultScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final repo = await getRepository();
+      await repo.savePremiumAnalysis(widget.analysis);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final analysis = widget.analysis;

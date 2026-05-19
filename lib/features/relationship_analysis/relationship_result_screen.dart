@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/widgets/home_button.dart';
 import 'package:go_router/go_router.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../../app/router.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_strings.dart';
@@ -12,7 +11,7 @@ import '../../core/widgets/pin_code_display.dart';
 import '../../core/widgets/pin_code_tree.dart';
 import '../../data/models/element_balance.dart';
 import '../../data/models/relationship_analysis.dart';
-import '../../data/repositories/local_analysis_repository.dart';
+import '../../data/repositories/repository_provider.dart';
 import '../../data/services/element_balance_calculator.dart';
 
 class RelationshipResultScreen extends StatefulWidget {
@@ -29,9 +28,8 @@ class _RelationshipResultScreenState extends State<RelationshipResultScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final prefs = await SharedPreferences.getInstance();
-      await LocalAnalysisRepository(prefs)
-          .saveRelationshipAnalysis(widget.analysis);
+      final repo = await getRepository();
+      await repo.saveRelationshipAnalysis(widget.analysis);
     });
   }
 

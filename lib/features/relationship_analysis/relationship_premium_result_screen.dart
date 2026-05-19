@@ -5,6 +5,7 @@ import '../../core/constants/app_text_styles.dart';
 import '../../core/widgets/home_button.dart';
 import '../../core/widgets/pin_code_tree.dart';
 import '../../data/models/relationship_premium_analysis.dart';
+import '../../data/repositories/repository_provider.dart';
 import '../../data/services/element_balance_calculator.dart';
 
 class RelationshipPremiumResultScreen extends StatefulWidget {
@@ -18,6 +19,15 @@ class RelationshipPremiumResultScreen extends StatefulWidget {
 
 class _RelationshipPremiumResultScreenState
     extends State<RelationshipPremiumResultScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final repo = await getRepository();
+      await repo.saveRelationshipPremiumAnalysis(widget.analysis);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final a = widget.analysis;

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../../app/router.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_strings.dart';
@@ -12,7 +11,7 @@ import '../../data/models/person_analysis.dart';
 import '../../data/models/person_premium_analysis.dart';
 import '../../data/models/relationship_analysis.dart';
 import '../../data/models/relationship_premium_analysis.dart';
-import '../../data/repositories/local_analysis_repository.dart';
+import '../../data/repositories/repository_provider.dart';
 
 class HistoryScreen extends StatefulWidget {
   const HistoryScreen({super.key});
@@ -38,8 +37,7 @@ class _HistoryScreenState extends State<HistoryScreen>
   }
 
   Future<void> _load() async {
-    final prefs = await SharedPreferences.getInstance();
-    final repo = LocalAnalysisRepository(prefs);
+    final repo = await getRepository();
     final persons = await repo.getPersonAnalyses();
     final rels = await repo.getRelationshipAnalyses();
     final premiums = await repo.getPremiumAnalyses();
@@ -56,26 +54,22 @@ class _HistoryScreenState extends State<HistoryScreen>
   }
 
   Future<void> _deletePerson(String id) async {
-    final prefs = await SharedPreferences.getInstance();
-    await LocalAnalysisRepository(prefs).deletePersonAnalysis(id);
+    await (await getRepository()).deletePersonAnalysis(id);
     if (mounted) setState(() => _persons.removeWhere((e) => e.id == id));
   }
 
   Future<void> _deleteRelationship(String id) async {
-    final prefs = await SharedPreferences.getInstance();
-    await LocalAnalysisRepository(prefs).deleteRelationshipAnalysis(id);
+    await (await getRepository()).deleteRelationshipAnalysis(id);
     if (mounted) setState(() => _relationships.removeWhere((e) => e.id == id));
   }
 
   Future<void> _deletePremium(String id) async {
-    final prefs = await SharedPreferences.getInstance();
-    await LocalAnalysisRepository(prefs).deletePremiumAnalysis(id);
+    await (await getRepository()).deletePremiumAnalysis(id);
     if (mounted) setState(() => _premiums.removeWhere((e) => e.id == id));
   }
 
   Future<void> _deleteRelPremium(String id) async {
-    final prefs = await SharedPreferences.getInstance();
-    await LocalAnalysisRepository(prefs).deleteRelationshipPremiumAnalysis(id);
+    await (await getRepository()).deleteRelationshipPremiumAnalysis(id);
     if (mounted) setState(() => _relPremiums.removeWhere((e) => e.id == id));
   }
 

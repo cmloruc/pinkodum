@@ -6,9 +6,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_strings.dart';
 import '../../core/constants/app_text_styles.dart';
+import '../../app/router.dart';
 import '../../core/widgets/custom_button.dart';
 import '../../core/widgets/gradient_card.dart';
 import '../../data/services/api_key_service.dart';
+import '../../data/services/auth_service.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -25,18 +27,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
   String _selectedModel = ApiKeyService.defaultModel;
   bool _apiKeyLoaded = false;
   bool _saving = false;
-  String? _saveStatus; // 'success' | 'error'
+  String? _saveStatus;
+  AuthUser? _authUser;
+  bool _loggingOut = false;
 
   @override
   void initState() {
     super.initState();
-    _loadApiKey();
+    _loadSettings();
   }
 
-  Future<void> _loadApiKey() async {
+  Future<void> _loadSettings() async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final svc = ApiKeyService(prefs);
+      final auth = AuthService(prefs);
       if (mounted) {
         setState(() {
           _apiKeyService = svc;
@@ -44,11 +49,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
           _apiKeyController.text = svc.apiKey;
           _selectedModel = svc.model;
           _apiKeyLoaded = true;
+          _authUser = auth.currentUser;
         });
       }
     } catch (_) {
       if (mounted) setState(() => _apiKeyLoaded = true);
     }
+  }
+
+  Future<void> _logout() async {
+    setState(() => _loggingOut = true);
+    final prefs = await SharedPreferences.getInstance();
+    await AuthService(prefs).logout();
+    if (mounted) setState(() { _authUser = null; _loggingOut = false; });
   }
 
   Future<void> _saveApiKey() async {
@@ -122,6 +135,87 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // ── Hesap Bölümü ──────────────────────────────────
+                      _SectionHeader('Hesap'),
+                      const SizedBox(height: 12),
+                      _authUser != null
+                          ? GradientCard(
+                              padding: const EdgeInsets.all(16),
+                              borderColor: AppColors.gold.withValues(alpha: 0.2),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Container(
+                                        width: 40,
+                                        height: 40,
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          gradient: AppColors.goldGradient,
+                                        ),
+                                        child: const Icon(Icons.person,
+                                            size: 20,
+                                            color: AppColors.background),
+                                      ),
+                                      const SizedBox(width: 12),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(_authUser!.name,
+                                                style:
+                                                    AppTextStyles.titleMedium),
+                                            Text(_authUser!.email,
+                                                style: AppTextStyles.bodySmall),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 14),
+                                  GhostButton(
+                                    label: _loggingOut
+                                        ? 'Çıkış yapılıyor...'
+                                        : 'Çıkış Yap',
+                                    icon: Icons.logout,
+                                    onPressed: _loggingOut ? null : _logout,
+                                  ),
+                                ],
+                              ),
+                            )
+                          : GradientCard(
+                              padding: const EdgeInsets.all(16),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Giriş yaparak analizlerini tüm cihazlarda senkronize et.',
+                                    style: AppTextStyles.bodySmall,
+                                  ),
+                                  const SizedBox(height: 14),
+                                  GoldButton(
+                                    label: 'Giriş Yap',
+                                    icon: Icons.login,
+                                    onPressed: () async {
+                                      await context.push(AppRoutes.login);
+                                      _loadSettings();
+                                    },
+                                  ),
+                                  const SizedBox(height: 8),
+                                  GhostButton(
+                                    label: 'Hesap Oluştur',
+                                    icon: Icons.person_add_outlined,
+                                    onPressed: () async {
+                                      await context.push(AppRoutes.register);
+                                      _loadSettings();
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                      const SizedBox(height: 24),
                       // ── AI API Bölümü ─────────────────────────────────
                       _SectionHeader('AI API'),
                       const SizedBox(height: 8),

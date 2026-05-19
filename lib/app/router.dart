@@ -16,6 +16,8 @@ import '../features/relationship_analysis/relationship_form_screen.dart';
 import '../features/relationship_analysis/relationship_premium_loading_screen.dart';
 import '../features/relationship_analysis/relationship_premium_result_screen.dart';
 import '../features/relationship_analysis/relationship_result_screen.dart';
+import '../features/auth/login_screen.dart';
+import '../features/auth/register_screen.dart';
 import '../features/settings/settings_screen.dart';
 import '../features/single_analysis/premium_loading_screen.dart';
 import '../features/single_analysis/premium_purchase_screen.dart';
@@ -40,6 +42,8 @@ class AppRoutes {
   static const premiumLoading = '/premium-loading';
   static const premiumResult = '/premium-result';
   static const settings = '/settings';
+  static const login = '/login';
+  static const register = '/register';
 }
 
 GoRouter buildRouter() {
@@ -130,6 +134,14 @@ GoRouter buildRouter() {
       GoRoute(
         path: AppRoutes.settings,
         builder: (_, __) => const SettingsScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.login,
+        builder: (_, __) => const LoginScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.register,
+        builder: (_, __) => const RegisterScreen(),
       ),
     ],
     redirect: (context, state) async {

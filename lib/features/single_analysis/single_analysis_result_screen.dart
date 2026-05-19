@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../../app/router.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_strings.dart';
@@ -12,7 +11,7 @@ import '../../core/widgets/home_button.dart';
 import '../../core/widgets/pin_code_tree.dart';
 import '../../data/models/element_balance.dart';
 import '../../data/models/person_analysis.dart';
-import '../../data/repositories/local_analysis_repository.dart';
+import '../../data/repositories/repository_provider.dart';
 
 class SingleAnalysisResultScreen extends StatefulWidget {
   final PersonAnalysis analysis;
@@ -29,8 +28,8 @@ class _SingleAnalysisResultScreenState
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final prefs = await SharedPreferences.getInstance();
-      await LocalAnalysisRepository(prefs).savePersonAnalysis(widget.analysis);
+      final repo = await getRepository();
+      await repo.savePersonAnalysis(widget.analysis);
     });
   }
 
