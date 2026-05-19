@@ -1,18 +1,58 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/widgets/home_button.dart';
 import 'package:go_router/go_router.dart';
 import '../../app/router.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_strings.dart';
 import '../../core/constants/app_text_styles.dart';
+import '../../core/widgets/custom_button.dart';
 import '../../data/models/person_analysis.dart';
+import '../../data/services/auth_service.dart';
+import '../../data/services/purchase_service.dart';
 
-class PremiumPurchaseScreen extends StatelessWidget {
+class PremiumPurchaseScreen extends StatefulWidget {
   final PersonAnalysis analysis;
   const PremiumPurchaseScreen({super.key, required this.analysis});
 
   @override
+  State<PremiumPurchaseScreen> createState() => _PremiumPurchaseScreenState();
+}
+
+class _PremiumPurchaseScreenState extends State<PremiumPurchaseScreen> {
+  int _credits = 0;
+  bool _loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCredits();
+  }
+
+  Future<void> _loadCredits() async {
+    final prefs = await SharedPreferences.getInstance();
+    final auth = AuthService(prefs);
+    if (auth.isLoggedIn) {
+      // Krediyi backend'den çek — auth.me endpoint'inden
+      try {
+        final user = await auth.fetchMe();
+        if (mounted) setState(() { _credits = user?.credits ?? 0; });
+      } catch (_) {}
+    }
+    if (mounted) setState(() => _loading = false);
+  }
+
+  void _onProceed() {
+    if (_credits >= kCreditsPerPremiumAnalysis) {
+      context.push(AppRoutes.premiumLoading, extra: widget.analysis);
+    } else {
+      context.push(AppRoutes.premium);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final analysis = widget.analysis;
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
@@ -69,9 +109,9 @@ class PremiumPurchaseScreen extends StatelessWidget {
 
                       // Fiyat kartı
                       _PriceCard(
-                        onTap: () => context.push(
-                            AppRoutes.premiumLoading,
-                            extra: analysis),
+                        credits: _credits,
+                        loading: _loading,
+                        onTap: _onProceed,
                       ),
                       const SizedBox(height: 16),
 
@@ -165,8 +205,10 @@ class _WhatYouGet extends StatelessWidget {
 }
 
 class _PriceCard extends StatelessWidget {
+  final int credits;
+  final bool loading;
   final VoidCallback onTap;
-  const _PriceCard({required this.onTap});
+  const _PriceCard({required this.credits, required this.loading, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -219,11 +261,20 @@ class _PriceCard extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 10),
-            Text(
-              'Tek seferlik ödeme • Anında erişim',
-              style: AppTextStyles.bodySmall.copyWith(
-                  color: AppColors.background.withValues(alpha: 0.7)),
-            ),
+            if (loading)
+              const CircularProgressIndicator(color: AppColors.background, strokeWidth: 2)
+            else if (credits >= kCreditsPerPremiumAnalysis)
+              Text(
+                '$credits krediniz var • $kCreditsPerPremiumAnalysis kredi harcanacak',
+                style: AppTextStyles.bodySmall.copyWith(
+                    color: AppColors.background.withValues(alpha: 0.85)),
+              )
+            else
+              Text(
+                'Yetersiz kredi • Kredi satın al',
+                style: AppTextStyles.bodySmall.copyWith(
+                    color: AppColors.background.withValues(alpha: 0.7)),
+              ),
           ],
         ),
       ),

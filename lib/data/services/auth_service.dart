@@ -7,12 +7,19 @@ class AuthUser {
   final String id;
   final String email;
   final String name;
-  const AuthUser({required this.id, required this.email, required this.name});
+  final int credits;
+  const AuthUser({
+    required this.id,
+    required this.email,
+    required this.name,
+    this.credits = 0,
+  });
 
   factory AuthUser.fromJson(Map<String, dynamic> json) => AuthUser(
         id: json['id'] as String,
         email: json['email'] as String,
         name: (json['name'] as String?) ?? '',
+        credits: (json['credits'] as int?) ?? 0,
       );
 }
 
@@ -73,6 +80,21 @@ class AuthService {
       throw Exception(_extractError(body));
     }
     return _handleAuthResponse(body);
+  }
+
+  Future<AuthUser?> fetchMe() async {
+    if (!isLoggedIn) return null;
+    final res = await http
+        .get(
+          Uri.parse('${AppConfig.backendBaseUrl}/auth/me'),
+          headers: {
+            'authorization': 'Bearer $token',
+            'content-type': 'application/json',
+          },
+        )
+        .timeout(const Duration(seconds: 10));
+    if (res.statusCode != 200) return null;
+    return AuthUser.fromJson(jsonDecode(res.body) as Map<String, dynamic>);
   }
 
   Future<void> logout() async {

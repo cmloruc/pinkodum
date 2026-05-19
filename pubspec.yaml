@@ -31,6 +31,9 @@ dependencies:
   flutter_localizations:
     sdk: flutter
 
+  # IAP
+  in_app_purchase: ^3.2.0
+
   # Utils
   intl: ^0.20.2
   uuid: ^4.4.0
