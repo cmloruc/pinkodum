@@ -1,13 +1,16 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../core/constants/app_config.dart';
 import '../mock/mock_data.dart';
 import '../models/person_analysis.dart';
 import '../models/person_premium_analysis.dart';
 import '../models/relationship_analysis.dart';
 import '../models/relationship_premium_analysis.dart';
 import 'api_key_service.dart';
+import 'auth_service.dart';
 import 'element_balance_calculator.dart';
 import 'mock_analysis_service.dart';
 import 'pin_code_calculator.dart';
@@ -374,11 +377,41 @@ class AiAnalysisService implements AnalysisService {
   }
 
   // ─── AI API İsteği ───────────────────────────────────────────────────────
-  Future<String> _callApi(String userMessage, {int maxTokens = 1024}) {
-    if (_keyService.isOpenAi) {
-      return _callOpenAiApi(userMessage, maxTokens: maxTokens);
+  // Kişisel API anahtarı varsa direkt çağrı, yoksa backend proxy kullanılır.
+  Future<String> _callApi(String userMessage, {int maxTokens = 1024}) async {
+    if (_keyService.hasApiKey) {
+      if (_keyService.isOpenAi) {
+        return _callOpenAiApi(userMessage, maxTokens: maxTokens);
+      }
+      return _callClaudeApi(userMessage, maxTokens: maxTokens);
     }
-    return _callClaudeApi(userMessage, maxTokens: maxTokens);
+    return _callBackendProxy(userMessage, maxTokens: maxTokens);
+  }
+
+  Future<String> _callBackendProxy(String userMessage, {int maxTokens = 1024}) async {
+    final prefs = await SharedPreferences.getInstance();
+    final auth = AuthService(prefs);
+
+    if (!auth.isLoggedIn) {
+      throw Exception('Analiz yapmak için giriş yapman gerekiyor.');
+    }
+
+    final response = await http.post(
+      Uri.parse('${AppConfig.backendBaseUrl}/ai/query'),
+      headers: {
+        'content-type': 'application/json',
+        'authorization': 'Bearer ${auth.token}',
+      },
+      body: jsonEncode({'userMessage': userMessage, 'maxTokens': maxTokens}),
+    ).timeout(const Duration(seconds: 120));
+
+    if (response.statusCode != 201 && response.statusCode != 200) {
+      final body = jsonDecode(response.body) as Map<String, dynamic>;
+      throw Exception(body['message'] ?? 'AI sorgu hatası: ${response.statusCode}');
+    }
+
+    final decoded = jsonDecode(response.body) as Map<String, dynamic>;
+    return decoded['text'] as String;
   }
 
   Future<String> _callClaudeApi(
