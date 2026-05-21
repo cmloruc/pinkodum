@@ -40,7 +40,11 @@ import UserNotifications
   }
 
   override func applicationDidBecomeActive(_ application: UIApplication) {
-    UNUserNotificationCenter.current().setBadgeCount(0, withCompletionHandler: nil)
+    if #available(iOS 16.0, *) {
+      UNUserNotificationCenter.current().setBadgeCount(0, withCompletionHandler: nil)
+    } else {
+      application.applicationIconBadgeNumber = 0
+    }
     super.applicationDidBecomeActive(application)
   }
 }
