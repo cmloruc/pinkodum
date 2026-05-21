@@ -51,8 +51,7 @@ class ApiAnalysisRepository implements AnalysisRepository {
       if (relationshipType != null) 'relationshipType': relationshipType,
     };
     final res = await http
-        .post(Uri.parse(_base),
-            headers: _headers, body: jsonEncode(body))
+        .post(Uri.parse(_base), headers: _headers, body: jsonEncode(body))
         .timeout(const Duration(seconds: 15));
     if (res.statusCode != 201) throw Exception('Analiz kaydedilemedi.');
   }
@@ -60,15 +59,20 @@ class ApiAnalysisRepository implements AnalysisRepository {
   // Analiz model id'si ile backend satır id'sini eşleştirip siler.
   Future<void> _deleteByAnalysisId(String type, String analysisId) async {
     final rows = await _fetchByType(type);
-    final row = rows.cast<Map<String, dynamic>?>().firstWhere(
-          (r) =>
-              (r!['result'] as Map<String, dynamic>)['id'] == analysisId,
-          orElse: () => null,
-        );
-    if (row == null) return;
-    await http
-        .delete(Uri.parse('$_base/${row['id']}'), headers: _headers)
-        .timeout(const Duration(seconds: 15));
+    final matchingRows = rows
+        .where((row) =>
+            (row['result'] as Map<String, dynamic>)['id'] == analysisId)
+        .toList();
+    if (matchingRows.isEmpty) return;
+
+    for (final row in matchingRows) {
+      final res = await http
+          .delete(Uri.parse('$_base/${row['id']}'), headers: _headers)
+          .timeout(const Duration(seconds: 15));
+      if (res.statusCode >= 400) {
+        throw Exception('Analiz silinemedi.');
+      }
+    }
   }
 
   // ─── Person ──────────────────────────────────────────────────────────────────
@@ -76,9 +80,11 @@ class ApiAnalysisRepository implements AnalysisRepository {
   @override
   Future<List<PersonAnalysis>> getPersonAnalyses() async {
     final rows = await _fetchByType('single');
+    final seen = <String>{};
     return rows
-        .map((e) =>
-            PersonAnalysis.fromJson(e['result'] as Map<String, dynamic>))
+        .map(
+            (e) => PersonAnalysis.fromJson(e['result'] as Map<String, dynamic>))
+        .where((analysis) => seen.add(analysis.id))
         .toList();
   }
 
@@ -109,9 +115,11 @@ class ApiAnalysisRepository implements AnalysisRepository {
   @override
   Future<List<RelationshipAnalysis>> getRelationshipAnalyses() async {
     final rows = await _fetchByType('relationship');
+    final seen = <String>{};
     return rows
         .map((e) =>
             RelationshipAnalysis.fromJson(e['result'] as Map<String, dynamic>))
+        .where((analysis) => seen.add(analysis.id))
         .toList();
   }
 
@@ -126,8 +134,7 @@ class ApiAnalysisRepository implements AnalysisRepository {
   }
 
   @override
-  Future<void> saveRelationshipAnalysis(RelationshipAnalysis analysis) =>
-      _save(
+  Future<void> saveRelationshipAnalysis(RelationshipAnalysis analysis) => _save(
         'relationship',
         analysis.toJson(),
         subjectName: analysis.firstName,
@@ -146,9 +153,11 @@ class ApiAnalysisRepository implements AnalysisRepository {
   @override
   Future<List<PersonPremiumAnalysis>> getPremiumAnalyses() async {
     final rows = await _fetchByType('single_premium');
+    final seen = <String>{};
     return rows
-        .map((e) => PersonPremiumAnalysis.fromJson(
-            e['result'] as Map<String, dynamic>))
+        .map((e) =>
+            PersonPremiumAnalysis.fromJson(e['result'] as Map<String, dynamic>))
+        .where((analysis) => seen.add(analysis.id))
         .toList();
   }
 
@@ -167,11 +176,14 @@ class ApiAnalysisRepository implements AnalysisRepository {
   // ─── Premium İlişki ───────────────────────────────────────────────────────────
 
   @override
-  Future<List<RelationshipPremiumAnalysis>> getRelationshipPremiumAnalyses() async {
+  Future<List<RelationshipPremiumAnalysis>>
+      getRelationshipPremiumAnalyses() async {
     final rows = await _fetchByType('relationship_premium');
+    final seen = <String>{};
     return rows
         .map((e) => RelationshipPremiumAnalysis.fromJson(
             e['result'] as Map<String, dynamic>))
+        .where((analysis) => seen.add(analysis.id))
         .toList();
   }
 

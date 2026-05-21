@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/widgets/home_button.dart';
@@ -6,7 +7,6 @@ import '../../app/router.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_strings.dart';
 import '../../core/constants/app_text_styles.dart';
-import '../../core/widgets/custom_button.dart';
 import '../../data/models/person_analysis.dart';
 import '../../data/services/auth_service.dart';
 import '../../data/services/purchase_service.dart';
@@ -21,7 +21,9 @@ class PremiumPurchaseScreen extends StatefulWidget {
 
 class _PremiumPurchaseScreenState extends State<PremiumPurchaseScreen> {
   int _credits = 0;
+  AuthUser? _user;
   bool _loading = true;
+  String? _creditLoadError;
 
   @override
   void initState() {
@@ -36,14 +38,30 @@ class _PremiumPurchaseScreenState extends State<PremiumPurchaseScreen> {
       // Krediyi backend'den çek — auth.me endpoint'inden
       try {
         final user = await auth.fetchMe();
-        if (mounted) setState(() { _credits = user?.credits ?? 0; });
-      } catch (_) {}
+        if (mounted) {
+          setState(() {
+            _credits = user?.credits ?? 0;
+            _user = user;
+          });
+        }
+      } catch (e) {
+        debugPrint('Credit load error: $e');
+        if (mounted) {
+          setState(() {
+            _creditLoadError =
+                'Kredi bilgisi alınamadı. Bağlantını ve giriş durumunu kontrol et.';
+          });
+        }
+      }
     }
     if (mounted) setState(() => _loading = false);
   }
 
   void _onProceed() {
-    if (_credits >= kCreditsPerPremiumAnalysis) {
+    if (_user?.isAdmin == true ||
+        _user?.hasActivePremium == true ||
+        _credits >= kCreditsPerPremiumAnalysis ||
+        kIsWeb) {
       context.push(AppRoutes.premiumLoading, extra: widget.analysis);
     } else {
       context.push(AppRoutes.premium);
@@ -67,8 +85,7 @@ class _PremiumPurchaseScreenState extends State<PremiumPurchaseScreen> {
             children: [
               // AppBar
               Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 child: Row(
                   children: [
                     IconButton(
@@ -98,8 +115,8 @@ class _PremiumPurchaseScreenState extends State<PremiumPurchaseScreen> {
                       const SizedBox(height: 4),
                       Text(
                         analysis.pinCodeFormatted,
-                        style: AppTextStyles.bodyMedium.copyWith(
-                            letterSpacing: 2),
+                        style:
+                            AppTextStyles.bodyMedium.copyWith(letterSpacing: 2),
                       ),
                       const SizedBox(height: 32),
 
@@ -110,7 +127,9 @@ class _PremiumPurchaseScreenState extends State<PremiumPurchaseScreen> {
                       // Fiyat kartı
                       _PriceCard(
                         credits: _credits,
+                        user: _user,
                         loading: _loading,
+                        error: _creditLoadError,
                         onTap: _onProceed,
                       ),
                       const SizedBox(height: 16),
@@ -137,20 +156,43 @@ class _WhatYouGet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const items = [
-      (Icons.person_outline, 'Kişilik', '9 hanenin tamamı ayrı ayrı yorumlanır'),
-      (Icons.auto_awesome_mosaic_outlined, 'Element Analizi', 'Baskın ve zayıf elementlerin hayatına etkisi'),
-      (Icons.school_outlined, 'Yaşam Dersin', 'Bu yaşamdaki en derin öğrenme alanın'),
-      (Icons.wb_sunny_outlined, 'Bu Yıl', 'Bu yıl için özel enerji ve odak noktası'),
-      (Icons.psychology_outlined, 'Gölge Taraflar', 'Güçlü yönlerin yanı sıra zorlu kalıpların'),
-      (Icons.bookmark_outline, 'Kaydedilir', 'Analizini istediğin zaman tekrar okuyabilirsin'),
+      (
+        Icons.person_outline,
+        'Kişilik',
+        '9 hanenin tamamı ayrı ayrı yorumlanır'
+      ),
+      (
+        Icons.auto_awesome_mosaic_outlined,
+        'Element Analizi',
+        'Baskın ve zayıf elementlerin hayatına etkisi'
+      ),
+      (
+        Icons.school_outlined,
+        'Yaşam Dersin',
+        'Bu yaşamdaki en derin öğrenme alanın'
+      ),
+      (
+        Icons.wb_sunny_outlined,
+        'Bu Yıl',
+        'Bu yıl için özel enerji ve odak noktası'
+      ),
+      (
+        Icons.psychology_outlined,
+        'Gölge Taraflar',
+        'Güçlü yönlerin yanı sıra zorlu kalıpların'
+      ),
+      (
+        Icons.bookmark_outline,
+        'Kaydedilir',
+        'Analizini istediğin zaman tekrar okuyabilirsin'
+      ),
     ];
 
     return Container(
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-            color: AppColors.gold.withValues(alpha: 0.2)),
+        border: Border.all(color: AppColors.gold.withValues(alpha: 0.2)),
       ),
       padding: const EdgeInsets.all(20),
       child: Column(
@@ -161,8 +203,8 @@ class _WhatYouGet extends StatelessWidget {
               const Icon(Icons.star, size: 15, color: AppColors.gold),
               const SizedBox(width: 8),
               Text('Detaylı Analizinde Neler Var?',
-                  style: AppTextStyles.titleMedium.copyWith(
-                      color: AppColors.textGold)),
+                  style: AppTextStyles.titleMedium
+                      .copyWith(color: AppColors.textGold)),
             ],
           ),
           const SizedBox(height: 16),
@@ -178,8 +220,7 @@ class _WhatYouGet extends StatelessWidget {
                         color: AppColors.gold.withValues(alpha: 0.1),
                         shape: BoxShape.circle,
                       ),
-                      child: Icon(item.$1,
-                          size: 16, color: AppColors.gold),
+                      child: Icon(item.$1, size: 16, color: AppColors.gold),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
@@ -190,8 +231,7 @@ class _WhatYouGet extends StatelessWidget {
                               style: AppTextStyles.titleMedium
                                   .copyWith(fontSize: 14)),
                           const SizedBox(height: 2),
-                          Text(item.$3,
-                              style: AppTextStyles.bodySmall),
+                          Text(item.$3, style: AppTextStyles.bodySmall),
                         ],
                       ),
                     ),
@@ -206,9 +246,17 @@ class _WhatYouGet extends StatelessWidget {
 
 class _PriceCard extends StatelessWidget {
   final int credits;
+  final AuthUser? user;
   final bool loading;
+  final String? error;
   final VoidCallback onTap;
-  const _PriceCard({required this.credits, required this.loading, required this.onTap});
+  const _PriceCard({
+    required this.credits,
+    required this.user,
+    required this.loading,
+    required this.error,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -233,36 +281,54 @@ class _PriceCard extends StatelessWidget {
             Text(
               AppStrings.premiumSingleDetail,
               style: AppTextStyles.titleLarge.copyWith(
-                  color: AppColors.background,
-                  fontWeight: FontWeight.bold),
+                  color: AppColors.background, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 6),
             Text(
               AppStrings.priceSingleDetail,
-              style: AppTextStyles.displayMedium.copyWith(
-                  color: AppColors.background),
+              style: AppTextStyles.displayMedium
+                  .copyWith(color: AppColors.background),
             ),
             const SizedBox(height: 16),
             Container(
-              padding: const EdgeInsets.symmetric(
-                  horizontal: 32, vertical: 14),
+              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
               decoration: BoxDecoration(
                 color: AppColors.background.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                    color:
-                        AppColors.background.withValues(alpha: 0.3)),
+                    color: AppColors.background.withValues(alpha: 0.3)),
               ),
               child: Text(
                 'Analizi Aç',
                 style: AppTextStyles.titleLarge.copyWith(
-                    color: AppColors.background,
-                    fontWeight: FontWeight.bold),
+                    color: AppColors.background, fontWeight: FontWeight.bold),
               ),
             ),
             const SizedBox(height: 10),
             if (loading)
-              const CircularProgressIndicator(color: AppColors.background, strokeWidth: 2)
+              const CircularProgressIndicator(
+                  color: AppColors.background, strokeWidth: 2)
+            else if (error != null)
+              Text(
+                error!,
+                style: AppTextStyles.bodySmall.copyWith(
+                    color: AppColors.background.withValues(alpha: 0.78)),
+                textAlign: TextAlign.center,
+              )
+            else if (kIsWeb)
+              Text(
+                'Web test modu • kredi alınmadan analiz açılır',
+                style: AppTextStyles.bodySmall.copyWith(
+                    color: AppColors.background.withValues(alpha: 0.85)),
+                textAlign: TextAlign.center,
+              )
+            else if (user?.hasActivePremium == true)
+              Text(
+                'Premium aktif • Tekil ${user!.monthlySingleRemaining}/10 hakkınız var',
+                style: AppTextStyles.bodySmall.copyWith(
+                    color: AppColors.background.withValues(alpha: 0.85)),
+                textAlign: TextAlign.center,
+              )
             else if (credits >= kCreditsPerPremiumAnalysis)
               Text(
                 '$credits krediniz var • $kCreditsPerPremiumAnalysis kredi harcanacak',

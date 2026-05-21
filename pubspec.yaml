@@ -1,7 +1,7 @@
 name: pin_kodum
 description: Pin Kodum — Numeroloji temelli kişisel farkındalık uygulaması.
 publish_to: 'none'
-version: 1.0.0+1
+version: 1.0.0+4
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
@@ -37,8 +37,12 @@ dependencies:
   # PDF
   pdf: ^3.10.8
   printing: ^5.13.1
-  share_plus: ^9.0.0
+  share_plus: ^12.0.2
   path_provider: ^2.1.2
+
+  # Firebase
+  firebase_core: ^3.6.0
+  firebase_messaging: ^15.1.3
 
   # Utils
   intl: ^0.20.2

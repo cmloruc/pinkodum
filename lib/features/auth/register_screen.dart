@@ -6,6 +6,7 @@ import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_text_styles.dart';
 import '../../core/widgets/auth_text_field.dart';
 import '../../core/widgets/custom_button.dart';
+import '../../core/widgets/date_picker_row.dart';
 import '../../data/services/auth_service.dart';
 import 'login_screen.dart' show AuthErrorBox;
 
@@ -21,6 +22,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _nameCtrl = TextEditingController();
   final _emailCtrl = TextEditingController();
   final _passCtrl = TextEditingController();
+  DateTime? _birthDate;
   bool _loading = false;
   bool _obscure = true;
   String? _error;
@@ -35,17 +37,31 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
-    setState(() { _loading = true; _error = null; });
+    if (_birthDate == null) {
+      setState(() => _error = 'Doğum tarihini seç.');
+      return;
+    }
+    if (_birthDate!.isAfter(DateTime.now())) {
+      setState(() => _error = 'Doğum tarihi gelecekte olamaz.');
+      return;
+    }
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
     try {
       final prefs = await SharedPreferences.getInstance();
       await AuthService(prefs).register(
         email: _emailCtrl.text.trim(),
         name: _nameCtrl.text.trim(),
+        birthDate: _birthDate!,
         password: _passCtrl.text,
       );
       if (mounted) context.go(AppRoutes.home);
     } catch (e) {
-      if (mounted) setState(() => _error = e.toString().replaceFirst('Exception: ', ''));
+      if (mounted) {
+        setState(() => _error = e.toString().replaceFirst('Exception: ', ''));
+      }
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -86,8 +102,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     controller: _emailCtrl,
                     label: 'E-posta',
                     keyboardType: TextInputType.emailAddress,
-                    validator: (v) =>
-                        (v == null || !v.contains('@')) ? 'Geçerli e-posta gir' : null,
+                    validator: (v) => (v == null || !v.contains('@'))
+                        ? 'Geçerli e-posta gir'
+                        : null,
+                  ),
+                  const SizedBox(height: 16),
+                  Text('Doğum Tarihi', style: AppTextStyles.labelMedium),
+                  const SizedBox(height: 8),
+                  DatePickerRow(
+                    initialDate: _birthDate,
+                    onChanged: (d) => setState(() => _birthDate = d),
                   ),
                   const SizedBox(height: 16),
                   AuthTextField(

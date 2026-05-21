@@ -22,9 +22,11 @@ class LocalAnalysisRepository implements AnalysisRepository {
   @override
   Future<List<PersonAnalysis>> getPersonAnalyses() async {
     final raw = _prefs.getStringList(_personKey) ?? [];
+    final seen = <String>{};
     return raw
-        .map((s) => PersonAnalysis.fromJson(
-            jsonDecode(s) as Map<String, dynamic>))
+        .map((s) =>
+            PersonAnalysis.fromJson(jsonDecode(s) as Map<String, dynamic>))
+        .where((analysis) => seen.add(analysis.id))
         .toList()
       ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
   }
@@ -53,7 +55,9 @@ class LocalAnalysisRepository implements AnalysisRepository {
   @override
   Future<void> deletePersonAnalysis(String id) async {
     final list = await getPersonAnalyses();
-    final updated = list.where((e) => e.id != id).toList();
+    final index = list.indexWhere((e) => e.id == id);
+    if (index == -1) return;
+    final updated = [...list]..removeAt(index);
     await _prefs.setStringList(
       _personKey,
       updated.map((e) => jsonEncode(e.toJson())).toList(),
@@ -65,9 +69,11 @@ class LocalAnalysisRepository implements AnalysisRepository {
   @override
   Future<List<RelationshipAnalysis>> getRelationshipAnalyses() async {
     final raw = _prefs.getStringList(_relationshipKey) ?? [];
+    final seen = <String>{};
     return raw
         .map((s) => RelationshipAnalysis.fromJson(
             jsonDecode(s) as Map<String, dynamic>))
+        .where((analysis) => seen.add(analysis.id))
         .toList()
       ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
   }
@@ -96,7 +102,9 @@ class LocalAnalysisRepository implements AnalysisRepository {
   @override
   Future<void> deleteRelationshipAnalysis(String id) async {
     final list = await getRelationshipAnalyses();
-    final updated = list.where((e) => e.id != id).toList();
+    final index = list.indexWhere((e) => e.id == id);
+    if (index == -1) return;
+    final updated = [...list]..removeAt(index);
     await _prefs.setStringList(
       _relationshipKey,
       updated.map((e) => jsonEncode(e.toJson())).toList(),
@@ -108,9 +116,11 @@ class LocalAnalysisRepository implements AnalysisRepository {
   @override
   Future<List<PersonPremiumAnalysis>> getPremiumAnalyses() async {
     final raw = _prefs.getStringList(_premiumKey) ?? [];
+    final seen = <String>{};
     return raw
         .map((s) => PersonPremiumAnalysis.fromJson(
             jsonDecode(s) as Map<String, dynamic>))
+        .where((analysis) => seen.add(analysis.id))
         .toList()
       ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
   }
@@ -129,7 +139,9 @@ class LocalAnalysisRepository implements AnalysisRepository {
   @override
   Future<void> deletePremiumAnalysis(String id) async {
     final list = await getPremiumAnalyses();
-    final updated = list.where((e) => e.id != id).toList();
+    final index = list.indexWhere((e) => e.id == id);
+    if (index == -1) return;
+    final updated = [...list]..removeAt(index);
     await _prefs.setStringList(
       _premiumKey,
       updated.map((e) => jsonEncode(e.toJson())).toList(),
@@ -139,11 +151,14 @@ class LocalAnalysisRepository implements AnalysisRepository {
   // ─── Relationship Premium ──────────────────────────────────────────────────
 
   @override
-  Future<List<RelationshipPremiumAnalysis>> getRelationshipPremiumAnalyses() async {
+  Future<List<RelationshipPremiumAnalysis>>
+      getRelationshipPremiumAnalyses() async {
     final raw = _prefs.getStringList(_relPremiumKey) ?? [];
+    final seen = <String>{};
     return raw
         .map((s) => RelationshipPremiumAnalysis.fromJson(
             jsonDecode(s) as Map<String, dynamic>))
+        .where((analysis) => seen.add(analysis.id))
         .toList()
       ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
   }
@@ -162,7 +177,9 @@ class LocalAnalysisRepository implements AnalysisRepository {
   @override
   Future<void> deleteRelationshipPremiumAnalysis(String id) async {
     final list = await getRelationshipPremiumAnalyses();
-    final updated = list.where((e) => e.id != id).toList();
+    final index = list.indexWhere((e) => e.id == id);
+    if (index == -1) return;
+    final updated = [...list]..removeAt(index);
     await _prefs.setStringList(
       _relPremiumKey,
       updated.map((e) => jsonEncode(e.toJson())).toList(),
@@ -174,5 +191,6 @@ class LocalAnalysisRepository implements AnalysisRepository {
     await _prefs.remove(_personKey);
     await _prefs.remove(_relationshipKey);
     await _prefs.remove(_premiumKey);
+    await _prefs.remove(_relPremiumKey);
   }
 }

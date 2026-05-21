@@ -14,6 +14,7 @@ import '../features/onboarding/splash_screen.dart';
 import '../features/premium/premium_screen.dart';
 import '../features/relationship_analysis/relationship_form_screen.dart';
 import '../features/relationship_analysis/relationship_premium_loading_screen.dart';
+import '../features/relationship_analysis/relationship_premium_purchase_screen.dart';
 import '../features/relationship_analysis/relationship_premium_result_screen.dart';
 import '../features/relationship_analysis/relationship_result_screen.dart';
 import '../features/auth/login_screen.dart';
@@ -24,6 +25,7 @@ import '../features/single_analysis/premium_purchase_screen.dart';
 import '../features/single_analysis/premium_result_screen.dart';
 import '../features/single_analysis/single_analysis_form_screen.dart';
 import '../features/single_analysis/single_analysis_result_screen.dart';
+import '../features/admin/admin_screen.dart';
 
 class AppRoutes {
   static const splash = '/';
@@ -37,6 +39,7 @@ class AppRoutes {
   static const insights = '/insights';
   static const premium = '/premium';
   static const premiumPurchase = '/premium-purchase';
+  static const relPremiumPurchase = '/rel-premium-purchase';
   static const relPremiumLoading = '/rel-premium-loading';
   static const relPremiumResult = '/rel-premium-result';
   static const premiumLoading = '/premium-loading';
@@ -44,6 +47,17 @@ class AppRoutes {
   static const settings = '/settings';
   static const login = '/login';
   static const register = '/register';
+  static const admin = '/admin';
+}
+
+class AnalysisRouteArgs<T> {
+  final T analysis;
+  final bool saveOnOpen;
+
+  const AnalysisRouteArgs({
+    required this.analysis,
+    this.saveOnOpen = true,
+  });
 }
 
 GoRouter buildRouter() {
@@ -69,8 +83,16 @@ GoRouter buildRouter() {
       GoRoute(
         path: AppRoutes.singleResult,
         builder: (context, state) {
-          final analysis = state.extra as PersonAnalysis;
-          return SingleAnalysisResultScreen(analysis: analysis);
+          final extra = state.extra;
+          if (extra is AnalysisRouteArgs<PersonAnalysis>) {
+            return SingleAnalysisResultScreen(
+              analysis: extra.analysis,
+              saveOnOpen: extra.saveOnOpen,
+            );
+          }
+          return SingleAnalysisResultScreen(
+            analysis: extra as PersonAnalysis,
+          );
         },
       ),
       GoRoute(
@@ -80,8 +102,16 @@ GoRouter buildRouter() {
       GoRoute(
         path: AppRoutes.relationshipResult,
         builder: (context, state) {
-          final analysis = state.extra as RelationshipAnalysis;
-          return RelationshipResultScreen(analysis: analysis);
+          final extra = state.extra;
+          if (extra is AnalysisRouteArgs<RelationshipAnalysis>) {
+            return RelationshipResultScreen(
+              analysis: extra.analysis,
+              saveOnOpen: extra.saveOnOpen,
+            );
+          }
+          return RelationshipResultScreen(
+            analysis: extra as RelationshipAnalysis,
+          );
         },
       ),
       GoRoute(
@@ -118,6 +148,13 @@ GoRouter buildRouter() {
         },
       ),
       GoRoute(
+        path: AppRoutes.relPremiumPurchase,
+        builder: (context, state) {
+          final a = state.extra as RelationshipAnalysis;
+          return RelationshipPremiumPurchaseScreen(analysis: a);
+        },
+      ),
+      GoRoute(
         path: AppRoutes.relPremiumLoading,
         builder: (context, state) {
           final a = state.extra as RelationshipAnalysis;
@@ -143,6 +180,10 @@ GoRouter buildRouter() {
         path: AppRoutes.register,
         builder: (_, __) => const RegisterScreen(),
       ),
+      GoRoute(
+        path: AppRoutes.admin,
+        builder: (_, __) => const AdminScreen(),
+      ),
     ],
     redirect: (context, state) async {
       if (state.matchedLocation == AppRoutes.splash) return null;
@@ -153,8 +194,8 @@ GoRouter buildRouter() {
       }
       return null;
     },
-    errorBuilder: (context, state) => Scaffold(
-      backgroundColor: const Color(0xFF0A0E1A),
+    errorBuilder: (context, state) => const Scaffold(
+      backgroundColor: Color(0xFF0A0E1A),
       body: Center(
         child: Text(
           'Sayfa bulunamadı',

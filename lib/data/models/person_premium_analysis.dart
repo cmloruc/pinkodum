@@ -90,4 +90,23 @@ class PersonPremiumAnalysis {
       );
 
   String toJsonString() => jsonEncode(toJson());
+
+  String get resolvedOverallSummary {
+    if (overallSummary.trim().isNotEmpty) return overallSummary;
+
+    final parts = [
+      elementDetail,
+      lifeLesson,
+      yearMessage,
+    ].where((text) => text.trim().isNotEmpty).toList();
+
+    if (parts.isEmpty) {
+      return '$name, bu detaylı rapor pin kodundaki ana temaların birlikte okunmasıyla oluşur. Güçlü taraflarını bilinçli kullanman, zorlandığın tekrarları fark etmen ve seçimlerini daha sakin bir yerden yapman bu haritanın ana davetidir.';
+    }
+
+    final joined = parts.join(' ');
+    return joined.length <= 520
+        ? joined
+        : '${joined.substring(0, 520).trim()}...';
+  }
 }

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
@@ -34,43 +35,85 @@ class _PremiumScreenState extends State<PremiumScreen> {
   }
 
   Future<void> _init() async {
-    final prefs = await SharedPreferences.getInstance();
-    final auth = AuthService(prefs);
-    await _purchaseService.init();
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final auth = AuthService(prefs);
 
-    _purchaseService.listenPurchases(_onPurchaseUpdate);
+      if (!kIsWeb) {
+        await _purchaseService.init().timeout(const Duration(seconds: 10));
+        _purchaseService.listenPurchases(_onPurchaseUpdate);
+      }
 
-    if (mounted) {
-      setState(() {
-        _user = auth.currentUser;
-        _loading = false;
-      });
+      AuthUser? user = auth.currentUser;
+      if (auth.isLoggedIn) {
+        user =
+            await auth.fetchMe().timeout(const Duration(seconds: 10)) ?? user;
+      }
+
+      if (mounted) {
+        setState(() {
+          _user = user;
+          _credits = user?.credits ?? 0;
+          _loading = false;
+        });
+      }
+    } catch (e) {
+      debugPrint('Premium init error: $e');
+      if (mounted) {
+        setState(() => _loading = false);
+        _showError('Premium bilgileri yüklenemedi. Lütfen tekrar deneyin.');
+      }
     }
   }
 
   Future<void> _onPurchaseUpdate(PurchaseDetails purchase) async {
     if (purchase.status == PurchaseStatus.purchased ||
         purchase.status == PurchaseStatus.restored) {
-      final totalCredits =
-          await _purchaseService.verifyWithBackend(purchase);
-      await _purchaseService.completePurchase(purchase);
+      try {
+        final totalCredits = await _purchaseService.verifyWithBackend(purchase);
+        await _purchaseService.completePurchase(purchase);
 
-      if (mounted) {
-        setState(() {
-          if (totalCredits != null) _credits = totalCredits;
-          _purchasing = false;
-          _purchasingId = null;
-        });
-        _showSuccess(totalCredits);
+        if (mounted) {
+          setState(() {
+            _credits = totalCredits;
+            _purchasing = false;
+            _purchasingId = null;
+          });
+          _showSuccess(totalCredits);
+        }
+      } catch (e) {
+        debugPrint('Purchase verification error: $e');
+        if (mounted) {
+          setState(() {
+            _purchasing = false;
+            _purchasingId = null;
+          });
+          _showError(e.toString().replaceFirst('Exception: ', ''));
+        }
       }
     } else if (purchase.status == PurchaseStatus.error) {
       await _purchaseService.completePurchase(purchase);
       if (mounted) {
-        setState(() { _purchasing = false; _purchasingId = null; });
+        setState(() {
+          _purchasing = false;
+          _purchasingId = null;
+        });
         _showError(purchase.error?.message ?? 'Satın alma başarısız.');
       }
     } else if (purchase.status == PurchaseStatus.canceled) {
-      if (mounted) setState(() { _purchasing = false; _purchasingId = null; });
+      if (mounted) {
+        setState(() {
+          _purchasing = false;
+          _purchasingId = null;
+        });
+      }
+    } else if (purchase.status == PurchaseStatus.pending) {
+      if (mounted) {
+        setState(() {
+          _purchasing = true;
+          _purchasingId = purchase.productID;
+        });
+      }
     }
   }
 
@@ -79,8 +122,18 @@ class _PremiumScreenState extends State<PremiumScreen> {
       _showError('App Store şu an kullanılamıyor.');
       return;
     }
-    setState(() { _purchasing = true; _purchasingId = product.id; });
-    await _purchaseService.buy(product);
+    setState(() {
+      _purchasing = true;
+      _purchasingId = product.id;
+    });
+    final started = await _purchaseService.buy(product);
+    if (!started && mounted) {
+      setState(() {
+        _purchasing = false;
+        _purchasingId = null;
+      });
+      _showError('Satın alma başlatılamadı.');
+    }
   }
 
   void _showSuccess(int? totalCredits) {
@@ -103,7 +156,8 @@ class _PremiumScreenState extends State<PremiumScreen> {
               Text('Toplam krediniz: $totalCredits',
                   style: AppTextStyles.bodyMedium),
             const SizedBox(height: 24),
-            GoldButton(label: 'Harika!', onPressed: () => Navigator.pop(context)),
+            GoldButton(
+                label: 'Harika!', onPressed: () => Navigator.pop(context)),
           ],
         ),
       ),
@@ -165,7 +219,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
                                 _init();
                               }),
                             ] else ...[
-                              _SectionTitle('Kredi Paketleri'),
+                              const _SectionTitle('Kredi Paketleri'),
                               const SizedBox(height: 12),
                               ..._buildProductCards(),
                               const SizedBox(height: 16),
@@ -187,13 +241,36 @@ class _PremiumScreenState extends State<PremiumScreen> {
   }
 
   List<Widget> _buildProductCards() {
+    if (kIsWeb) {
+      return [
+        GradientCard(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Icon(Icons.info_outline, color: AppColors.gold),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  'Web sürümünde App Store satın alma kapalı. PDF ve analiz testleri için detaylı analiz ekranından web test moduyla devam edebilirsiniz.',
+                  style: AppTextStyles.bodySmall
+                      .copyWith(color: AppColors.textSecondary),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ];
+    }
+
     if (!_purchaseService.isAvailable) {
       return [
         GradientCard(
           padding: const EdgeInsets.all(16),
           child: Row(
             children: [
-              const Icon(Icons.warning_amber_outlined, color: AppColors.warning),
+              const Icon(Icons.warning_amber_outlined,
+                  color: AppColors.warning),
               const SizedBox(width: 12),
               Expanded(
                 child: Text('App Store şu an kullanılamıyor.',
@@ -222,6 +299,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
           title: cp.title,
           description: cp.description,
           price: price,
+          isSubscription: cp.isSubscription,
           loading: isBuying,
           onTap: (_purchasing || storeProduct == null)
               ? null
@@ -267,13 +345,13 @@ class _PremiumHeader extends StatelessWidget {
             decoration: BoxDecoration(
               color: AppColors.gold.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(20),
-              border:
-                  Border.all(color: AppColors.gold.withValues(alpha: 0.3)),
+              border: Border.all(color: AppColors.gold.withValues(alpha: 0.3)),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.toll_outlined, size: 18, color: AppColors.gold),
+                const Icon(Icons.toll_outlined,
+                    size: 18, color: AppColors.gold),
                 const SizedBox(width: 8),
                 Text('$credits kredi',
                     style: AppTextStyles.titleMedium
@@ -281,6 +359,14 @@ class _PremiumHeader extends StatelessWidget {
               ],
             ),
           ),
+          if (user!.hasActivePremium) ...[
+            const SizedBox(height: 10),
+            Text(
+              'Premium aktif • Tekil ${user!.monthlySingleRemaining}/10 • İlişki ${user!.monthlyRelationshipRemaining}/10',
+              style: AppTextStyles.bodySmall.copyWith(color: AppColors.success),
+              textAlign: TextAlign.center,
+            ),
+          ],
         ],
       ],
     );
@@ -309,8 +395,7 @@ class _LoginGate extends StatelessWidget {
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 20),
-          GoldButton(
-              label: 'Giriş Yap', icon: Icons.login, onPressed: onLogin),
+          GoldButton(label: 'Giriş Yap', icon: Icons.login, onPressed: onLogin),
         ],
       ),
     );
@@ -323,6 +408,7 @@ class _CreditPackageCard extends StatelessWidget {
   final String title;
   final String description;
   final String price;
+  final bool isSubscription;
   final bool loading;
   final VoidCallback? onTap;
 
@@ -331,6 +417,7 @@ class _CreditPackageCard extends StatelessWidget {
     required this.title,
     required this.description,
     required this.price,
+    required this.isSubscription,
     required this.loading,
     required this.onTap,
   });
@@ -346,14 +433,17 @@ class _CreditPackageCard extends StatelessWidget {
           Container(
             width: 52,
             height: 52,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               shape: BoxShape.circle,
               gradient: AppColors.goldGradient,
             ),
             child: Center(
-              child: Text('$credits',
-                  style: AppTextStyles.titleLarge
-                      .copyWith(color: AppColors.background)),
+              child: isSubscription
+                  ? const Icon(Icons.workspace_premium,
+                      color: AppColors.background)
+                  : Text('$credits',
+                      style: AppTextStyles.titleLarge
+                          .copyWith(color: AppColors.background)),
             ),
           ),
           const SizedBox(width: 14),
@@ -417,13 +507,12 @@ class _CreditsInfo extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text('Kredi Kullanımı',
-              style:
-                  AppTextStyles.labelMedium.copyWith(color: AppColors.textGold)),
+              style: AppTextStyles.labelMedium
+                  .copyWith(color: AppColors.textGold)),
           const SizedBox(height: 12),
-          _InfoRow(Icons.person_outline, 'Tekil analiz', '1 kredi'),
-          _InfoRow(Icons.favorite_outline, 'İlişki analizi', '1 kredi'),
-          _InfoRow(Icons.auto_awesome, 'Detaylı tekil analiz', '3 kredi'),
-          _InfoRow(Icons.favorite, 'Detaylı ilişki analizi', '3 kredi'),
+          const _InfoRow(Icons.auto_awesome, 'Detaylı tekil analiz', '2 kredi'),
+          const _InfoRow(Icons.favorite, 'Detaylı ilişki analizi', '3 kredi'),
+          const _InfoRow(Icons.payments_outlined, '1 kredi', '49 TL'),
         ],
       ),
     );
@@ -444,11 +533,10 @@ class _InfoRow extends StatelessWidget {
         children: [
           Icon(icon, size: 16, color: AppColors.textMuted),
           const SizedBox(width: 8),
-          Expanded(
-              child: Text(label, style: AppTextStyles.bodySmall)),
+          Expanded(child: Text(label, style: AppTextStyles.bodySmall)),
           Text(value,
-              style: AppTextStyles.bodySmall
-                  .copyWith(color: AppColors.textGold)),
+              style:
+                  AppTextStyles.bodySmall.copyWith(color: AppColors.textGold)),
         ],
       ),
     );

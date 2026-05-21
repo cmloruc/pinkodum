@@ -13,10 +13,18 @@ import '../../data/models/element_balance.dart';
 import '../../data/models/person_analysis.dart';
 import '../../data/repositories/repository_provider.dart';
 import '../../data/services/pdf_service.dart';
+import '../../data/services/auth_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SingleAnalysisResultScreen extends StatefulWidget {
   final PersonAnalysis analysis;
-  const SingleAnalysisResultScreen({super.key, required this.analysis});
+  final bool saveOnOpen;
+
+  const SingleAnalysisResultScreen({
+    super.key,
+    required this.analysis,
+    this.saveOnOpen = true,
+  });
 
   @override
   State<SingleAnalysisResultScreen> createState() =>
@@ -30,6 +38,7 @@ class _SingleAnalysisResultScreenState
   @override
   void initState() {
     super.initState();
+    if (!widget.saveOnOpen) return;
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final repo = await getRepository();
       await repo.savePersonAnalysis(widget.analysis);
@@ -41,7 +50,8 @@ class _SingleAnalysisResultScreenState
     setState(() => _sharing = true);
     try {
       final file = await PdfService.generatePersonAnalysis(widget.analysis);
-      await PdfService.share(file, subject: 'Pin Kodum — ${widget.analysis.name}');
+      await PdfService.share(file,
+          subject: 'Pin Kodum — ${widget.analysis.name}');
     } finally {
       if (mounted) setState(() => _sharing = false);
     }
@@ -52,12 +62,12 @@ class _SingleAnalysisResultScreenState
     final a = widget.analysis;
     return Scaffold(
       body: Container(
-        decoration:
-            const BoxDecoration(gradient: AppColors.backgroundGradient),
+        decoration: const BoxDecoration(gradient: AppColors.backgroundGradient),
         child: SafeArea(
           child: Column(
             children: [
-              _ResultAppBar(name: a.name, onShare: _sharePdf, sharing: _sharing),
+              _ResultAppBar(
+                  name: a.name, onShare: _sharePdf, sharing: _sharing),
               Expanded(
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
@@ -96,7 +106,17 @@ class _SingleAnalysisResultScreenState
                       ),
                       const SizedBox(height: 16),
                       // Premium çekim kartı
-                      _PremiumHook(onTap: () => context.push(AppRoutes.premiumPurchase, extra: a)),
+                      _PremiumHook(
+                          onTap: () async {
+                            final prefs = await SharedPreferences.getInstance();
+                            final user = AuthService(prefs).currentUser;
+                            if (!context.mounted) return;
+                            if (user?.isAdmin == true || user?.hasActivePremium == true) {
+                              context.push(AppRoutes.premiumLoading, extra: a);
+                            } else {
+                              context.push(AppRoutes.premiumPurchase, extra: a);
+                            }
+                          }),
                       const SizedBox(height: 20),
                       GhostButton(
                         label: AppStrings.btnNewAnalysis,
@@ -119,7 +139,8 @@ class _ResultAppBar extends StatelessWidget {
   final String name;
   final VoidCallback onShare;
   final bool sharing;
-  const _ResultAppBar({required this.name, required this.onShare, required this.sharing});
+  const _ResultAppBar(
+      {required this.name, required this.onShare, required this.sharing});
 
   @override
   Widget build(BuildContext context) {
@@ -141,8 +162,10 @@ class _ResultAppBar extends StatelessWidget {
           ),
           sharing
               ? const SizedBox(
-                  width: 20, height: 20,
-                  child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.gold))
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                      strokeWidth: 2, color: AppColors.gold))
               : IconButton(
                   icon: const Icon(Icons.picture_as_pdf_outlined,
                       size: 20, color: AppColors.gold),
@@ -276,13 +299,12 @@ class _ElementTeaser extends StatelessWidget {
               const Spacer(),
               // Baskın element rozeti
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
                   color: AppColors.gold.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(6),
-                  border: Border.all(
-                      color: AppColors.gold.withValues(alpha: 0.3)),
+                  border:
+                      Border.all(color: AppColors.gold.withValues(alpha: 0.3)),
                 ),
                 child: Text(
                   'Baskın: ${e.dominantElement}',
@@ -312,8 +334,7 @@ class _ElementTeaser extends StatelessWidget {
           // Kilitli yorum alanı
           Container(
             width: double.infinity,
-            padding:
-                const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
             decoration: BoxDecoration(
               color: AppColors.surfaceLight,
               borderRadius: BorderRadius.circular(10),
@@ -322,8 +343,7 @@ class _ElementTeaser extends StatelessWidget {
             ),
             child: Row(
               children: [
-                const Icon(Icons.lock_outline,
-                    size: 14, color: AppColors.gold),
+                const Icon(Icons.lock_outline, size: 14, color: AppColors.gold),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
@@ -354,13 +374,12 @@ class _ElemBadge extends StatelessWidget {
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(6),
-        border:
-            Border.all(color: color.withValues(alpha: 0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Text(
         '$label  $count',
-        style: AppTextStyles.bodySmall.copyWith(
-            color: color, fontWeight: FontWeight.w600, fontSize: 11),
+        style: AppTextStyles.bodySmall
+            .copyWith(color: color, fontWeight: FontWeight.w600, fontSize: 11),
       ),
     );
   }
@@ -399,8 +418,7 @@ class _PremiumHook extends StatelessWidget {
                 Text(
                   'Detaylı Analizi Aç',
                   style: AppTextStyles.titleMedium.copyWith(
-                      color: AppColors.background,
-                      fontWeight: FontWeight.bold),
+                      color: AppColors.background, fontWeight: FontWeight.bold),
                 ),
                 const Spacer(),
                 const Icon(Icons.arrow_forward_ios,
@@ -418,14 +436,13 @@ class _PremiumHook extends StatelessWidget {
                   child: Row(
                     children: [
                       const Icon(Icons.check_circle,
-                          size: 13,
-                          color: AppColors.background),
+                          size: 13, color: AppColors.background),
                       const SizedBox(width: 6),
                       Text(
                         item,
                         style: AppTextStyles.bodySmall.copyWith(
-                            color: AppColors.background
-                                .withValues(alpha: 0.85)),
+                            color:
+                                AppColors.background.withValues(alpha: 0.85)),
                       ),
                     ],
                   ),

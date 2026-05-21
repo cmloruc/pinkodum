@@ -1,0 +1,1 @@
+{"flutter":{"platforms":{"ios":{"default":{"projectId":"pinkodum","appId":"1:94830600860:ios:396ba5201ae0717e92c359","uploadDebugSymbols":false,"fileOutput":"ios/Runner/GoogleService-Info.plist"}},"dart":{"lib/firebase_options.dart":{"projectId":"pinkodum","configurations":{"ios":"1:94830600860:ios:396ba5201ae0717e92c359","web":"1:94830600860:web:f2fae3cc767e7af192c359"}}}}}}

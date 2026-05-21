@@ -5,7 +5,6 @@ import '../../core/constants/app_text_styles.dart';
 import '../../core/widgets/home_button.dart';
 import '../../core/widgets/pin_code_tree.dart';
 import '../../data/models/relationship_premium_analysis.dart';
-import '../../data/repositories/repository_provider.dart';
 import '../../data/services/element_balance_calculator.dart';
 import '../../data/services/pdf_service.dart';
 
@@ -22,22 +21,15 @@ class _RelationshipPremiumResultScreenState
     extends State<RelationshipPremiumResultScreen> {
   bool _sharing = false;
 
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final repo = await getRepository();
-      await repo.saveRelationshipPremiumAnalysis(widget.analysis);
-    });
-  }
-
   Future<void> _sharePdf() async {
     if (_sharing) return;
     setState(() => _sharing = true);
     try {
-      final file = await PdfService.generateRelationshipPremium(widget.analysis);
+      final file =
+          await PdfService.generateRelationshipPremium(widget.analysis);
       await PdfService.share(file,
-          subject: 'Pin Kodum Detaylı — ${widget.analysis.firstName} & ${widget.analysis.secondName}');
+          subject:
+              'Pin Kodum Detaylı — ${widget.analysis.firstName} & ${widget.analysis.secondName}');
     } finally {
       if (mounted) setState(() => _sharing = false);
     }
@@ -75,11 +67,16 @@ class _RelationshipPremiumResultScreenState
                           textAlign: TextAlign.center),
                     ),
                     _sharing
-                        ? const SizedBox(width: 20, height: 20,
-                            child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.gold))
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                                strokeWidth: 2, color: AppColors.gold))
                         : IconButton(
-                            icon: const Icon(Icons.picture_as_pdf_outlined, size: 20, color: AppColors.gold),
-                            onPressed: _sharePdf, tooltip: 'PDF Rapor'),
+                            icon: const Icon(Icons.picture_as_pdf_outlined,
+                                size: 20, color: AppColors.gold),
+                            onPressed: _sharePdf,
+                            tooltip: 'PDF Rapor'),
                     const HomeButton(),
                   ],
                 ),

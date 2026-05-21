@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../app/router.dart';
@@ -8,6 +9,7 @@ import '../../data/models/relationship_analysis.dart';
 import '../../data/repositories/repository_provider.dart';
 import '../../data/services/ai_analysis_service.dart';
 import '../../data/services/api_key_service.dart';
+import '../../data/services/purchase_service.dart';
 
 class RelationshipPremiumLoadingScreen extends StatefulWidget {
   final RelationshipAnalysis analysis;
@@ -24,7 +26,6 @@ class _RelationshipPremiumLoadingScreenState
   late AnimationController _controller;
   late Animation<double> _pulse;
   int _messageIndex = 0;
-  bool _started = false;
 
   static const _messages = [
     'İki enerji bir araya getiriliyor...',
@@ -59,7 +60,6 @@ class _RelationshipPremiumLoadingScreenState
   }
 
   Future<void> _startAnalysis() async {
-    setState(() => _started = true);
     try {
       final prefs = await SharedPreferences.getInstance();
       final keyService = ApiKeyService(prefs);
@@ -73,6 +73,10 @@ class _RelationshipPremiumLoadingScreenState
         secondBirthDate: a.secondBirthDate,
         relationshipType: a.relationshipType,
       );
+
+      if (!kIsWeb) {
+        await PurchaseService().consumeAnalysisAccess('relationship');
+      }
 
       final repo = await getRepository();
       await repo.saveRelationshipPremiumAnalysis(premium);
@@ -113,98 +117,105 @@ class _RelationshipPremiumLoadingScreenState
           ),
         ),
         child: SafeArea(
-          child: Center(
-            child: Padding(
-              padding: const EdgeInsets.all(32),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  ScaleTransition(
-                    scale: _pulse,
-                    child: Container(
-                      width: 120,
-                      height: 120,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        gradient: AppColors.purpleGradient,
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppColors.purple.withValues(alpha: 0.4),
-                            blurRadius: 40,
-                            spreadRadius: 8,
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return SingleChildScrollView(
+                padding: const EdgeInsets.all(32),
+                child: ConstrainedBox(
+                  constraints:
+                      BoxConstraints(minHeight: constraints.maxHeight - 64),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ScaleTransition(
+                        scale: _pulse,
+                        child: Container(
+                          width: 120,
+                          height: 120,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            gradient: AppColors.purpleGradient,
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppColors.purple.withValues(alpha: 0.4),
+                                blurRadius: 40,
+                                spreadRadius: 8,
+                              ),
+                            ],
                           ),
-                        ],
+                          child: const Icon(Icons.favorite,
+                              size: 52, color: Colors.white),
+                        ),
                       ),
-                      child: const Icon(Icons.favorite,
-                          size: 52, color: Colors.white),
-                    ),
-                  ),
-                  const SizedBox(height: 48),
-                  Text('Detaylı İlişki Analizi',
-                      style: AppTextStyles.displayMedium),
-                  const SizedBox(height: 8),
-                  Text(
-                    '${widget.analysis.firstName} & ${widget.analysis.secondName}',
-                    style: AppTextStyles.headlineMedium
-                        .copyWith(color: AppColors.textSecondary),
-                  ),
-                  const SizedBox(height: 48),
-                  AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 500),
-                    child: Text(
-                      _messages[_messageIndex],
-                      key: ValueKey(_messageIndex),
-                      style: AppTextStyles.bodyLarge.copyWith(
-                        color: AppColors.purpleLight,
-                        fontStyle: FontStyle.italic,
+                      const SizedBox(height: 48),
+                      Text('Detaylı İlişki Analizi',
+                          style: AppTextStyles.displayMedium),
+                      const SizedBox(height: 8),
+                      Text(
+                        '${widget.analysis.firstName} & ${widget.analysis.secondName}',
+                        style: AppTextStyles.headlineMedium
+                            .copyWith(color: AppColors.textSecondary),
                       ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 12),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 12,
-                    ),
-                    decoration: BoxDecoration(
-                      color: AppColors.purple.withValues(alpha: 0.08),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: AppColors.purple.withValues(alpha: 0.22),
+                      const SizedBox(height: 48),
+                      AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 500),
+                        child: Text(
+                          _messages[_messageIndex],
+                          key: ValueKey(_messageIndex),
+                          style: AppTextStyles.bodyLarge.copyWith(
+                            color: AppColors.purpleLight,
+                            fontStyle: FontStyle.italic,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
                       ),
-                    ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Icon(Icons.info_outline,
-                            size: 18, color: AppColors.purpleLight),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: Text(
-                            'Detaylı analiz 1-2 dakika sürebilir. Lütfen uygulamayı kapatmayın ve ekrandan ayrılmayın.',
-                            style: AppTextStyles.bodySmall.copyWith(
-                              color: AppColors.textSecondary,
-                            ),
+                      const SizedBox(height: 20),
+                      Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 12),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.purple.withValues(alpha: 0.08),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: AppColors.purple.withValues(alpha: 0.22),
                           ),
                         ),
-                      ],
-                    ),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Icon(Icons.info_outline,
+                                size: 18, color: AppColors.purpleLight),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Text(
+                                'Detaylı analiz 1-2 dakika sürebilir. Lütfen uygulamayı kapatmayın ve ekrandan ayrılmayın.',
+                                style: AppTextStyles.bodySmall.copyWith(
+                                  color: AppColors.textSecondary,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      SizedBox(
+                        width: 200,
+                        child: LinearProgressIndicator(
+                          backgroundColor:
+                              AppColors.purple.withValues(alpha: 0.15),
+                          valueColor: const AlwaysStoppedAnimation<Color>(
+                              AppColors.purpleLight),
+                          minHeight: 2,
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 24),
-                  SizedBox(
-                    width: 200,
-                    child: LinearProgressIndicator(
-                      backgroundColor: AppColors.purple.withValues(alpha: 0.15),
-                      valueColor: const AlwaysStoppedAnimation<Color>(
-                          AppColors.purpleLight),
-                      minHeight: 2,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+                ),
+              );
+            },
           ),
         ),
       ),

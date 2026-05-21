@@ -28,7 +28,7 @@
 
 ## Aşama 2 — AI Hibrit Analiz
 
-**Durum:** Tamamlandı ✅ *(19 Mayıs 2025)*
+**Durum:** Tamamlandı ✅ *(19 Mayıs 2026)*
 
 - [x] Claude API entegrasyonu (birincil sağlayıcı)
 - [x] OpenAI Responses API entegrasyonu (yedek sağlayıcı)
@@ -51,51 +51,65 @@
 
 ## Aşama 3 — Backend Entegrasyonu
 
-**Tahmini:** Q3 2025
+**Durum:** Büyük ölçüde tamamlandı ✅
 
-- [ ] NestJS API kurulumu
-- [ ] PostgreSQL veritabanı
-- [ ] Kullanıcı kayıt / giriş sistemi
+- [x] NestJS API kurulumu
+- [x] PostgreSQL veritabanı
+- [x] Kullanıcı kayıt / giriş sistemi
 - [ ] E-posta + Apple + Google OAuth
-- [ ] JWT auth
-- [ ] Analiz geçmişi backend'e taşınması
-- [ ] `LocalAnalysisRepository` → `ApiAnalysisRepository` swap
-- [ ] API anahtarı istemciden sunucuya taşınması (güvenlik)
-- [ ] Flutter: token yönetimi
+- [x] JWT auth
+- [x] Analiz geçmişi backend'e taşınması
+- [x] `LocalAnalysisRepository` → `ApiAnalysisRepository` swap
+- [x] API anahtarı istemciden sunucuya taşınması (backend AI proxy)
+- [x] Flutter: token yönetimi
+- [x] Kayıt sırasında doğum tarihi alma
+- [x] Profilde doğum tarihi ve kredi bakiyesi gösterme
+- [x] Geçmiş analiz silme ve eski duplicate kayıt temizliği
 
 ---
 
 ## Aşama 4 — Ücretli Sistem
 
-**Tahmini:** Q3 2025
+**Durum:** Altyapı tamamlandı, App Store Connect/TestFlight aşamasında 🔄
 
-- [ ] App Store In-App Purchase
+- [x] App Store In-App Purchase altyapısı
 - [ ] Google Play Billing
-- [ ] Kredi sistemi backend implementasyonu
-- [ ] Tek seferlik analiz satın alma
+- [x] Kredi sistemi backend implementasyonu
+- [x] Tek seferlik detaylı analiz için kredi harcama
+- [x] Kredi fiyat modeli: 1 kredi = 49 TL, tekil analiz = 2 kredi, ilişki analizi = 3 kredi
+- [x] Premium paket: yıllık 899 TL, her ay 10 tekil + 10 ilişki hakkı
+- [x] Günlük içgörü: premiumlara açık, normal kullanıcıya 1 krediyle 24 saat
 - [ ] Aylık abonelik
 - [ ] Yıllık abonelik
-- [ ] `MockPremiumService` → gerçek `PremiumService` swap
+- [x] `MockPremiumService` → gerçek AI/premium akışı
 - [ ] Satın alma geçmişi ekranı
+- [x] Web'de IAP devre dışı, test modu açık
+- [x] Apple Developer hesabı onayı
+- [x] iOS In-App Purchase capability
+- [ ] App Store Connect uygulama ve ürün tanımları
+- [ ] TestFlight üzerinden IAP testi
 
 ---
 
 ## Aşama 5 — PDF Rapor
 
-**Tahmini:** Q4 2025
+**Durum:** Uygulama içi PDF tamamlandı ✅
 
-- [ ] Tek kişi PDF raporu
-- [ ] İlişki PDF raporu
+- [x] Tek kişi PDF raporu
+- [x] Detaylı tek kişi PDF raporu
+- [x] İlişki PDF raporu
+- [x] Detaylı ilişki PDF raporu
 - [ ] Pin Kodum logosu + filigran
-- [ ] Koyu tema + altın detaylı PDF tasarımı
-- [ ] PDF paylaşma (share_plus)
+- [x] Koyu tema + altın detaylı PDF tasarımı
+- [x] Uygulamadaki pin kodu ağacı / element / baskın-edilgen bölümleri
+- [x] PDF paylaşma (share_plus)
 - [ ] Backend'den PDF üretimi
 
 ---
 
 ## Aşama 6 — Bildirimler
 
-**Tahmini:** Q1 2026
+**Durum:** Yapılmadı
 
 - [ ] Firebase Cloud Messaging entegrasyonu
 - [ ] Günlük içgörü bildirimi (sabah)
@@ -108,7 +122,7 @@
 
 ## Aşama 7 — Admin Panel
 
-**Tahmini:** Q1 2026
+**Durum:** Yapılmadı
 
 - [ ] Next.js admin panel
 - [ ] Kullanıcı yönetimi
@@ -145,4 +159,5 @@
 - CI/CD pipeline (GitHub Actions)
 - Firebase Analytics entegrasyonu
 - Crashlytics entegrasyonu
-- API anahtarının istemcide saklanması geçici çözüm — Aşama 3'te backend'e taşınacak
+- Flutter testleri tek komutta `--concurrency=1` ile çalıştırılmalı; paralel Flutter test komutları native-assets crash üretebiliyor
+- OAuth girişleri ve App Store IAP gerçek cihaz/TestFlight testi bekliyor

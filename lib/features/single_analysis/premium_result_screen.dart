@@ -5,7 +5,6 @@ import '../../core/constants/app_text_styles.dart';
 import '../../core/widgets/home_button.dart';
 import '../../core/widgets/pin_code_tree.dart';
 import '../../data/models/person_premium_analysis.dart';
-import '../../data/repositories/repository_provider.dart';
 import '../../data/services/element_balance_calculator.dart';
 import '../../data/services/pdf_service.dart';
 
@@ -20,21 +19,35 @@ class PremiumResultScreen extends StatefulWidget {
 class _PremiumResultScreenState extends State<PremiumResultScreen> {
   bool _sharing = false;
 
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final repo = await getRepository();
-      await repo.savePremiumAnalysis(widget.analysis);
-    });
-  }
-
   Future<void> _sharePdf() async {
     if (_sharing) return;
     setState(() => _sharing = true);
     try {
-      final file = await PdfService.generatePersonPremium(widget.analysis);
-      await PdfService.share(file, subject: 'Pin Kodum Detaylı — ${widget.analysis.name}');
+      final opened = await PdfService.sharePersonPremium(widget.analysis,
+              subject: 'Pin Kodum Detaylı — ${widget.analysis.name}')
+          .timeout(const Duration(seconds: 20));
+      if (!mounted) return;
+      if (opened) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('PDF raporu hazırlanıp indirildi.')),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('PDF raporu açılamadı.')),
+        );
+      }
+    } catch (e) {
+      debugPrint('PDF share error: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            duration: const Duration(seconds: 5),
+            content: Text(
+              'PDF hazırlanamadı: ${e.toString().replaceFirst('Exception: ', '')}',
+            ),
+          ),
+        );
+      }
     } finally {
       if (mounted) setState(() => _sharing = false);
     }
@@ -55,7 +68,8 @@ class _PremiumResultScreenState extends State<PremiumResultScreen> {
         child: SafeArea(
           child: Column(
             children: [
-              _PremiumAppBar(name: analysis.name, onShare: _sharePdf, sharing: _sharing),
+              _PremiumAppBar(
+                  name: analysis.name, onShare: _sharePdf, sharing: _sharing),
               Expanded(
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.fromLTRB(20, 8, 20, 40),
@@ -233,7 +247,8 @@ class _PremiumAppBar extends StatelessWidget {
   final String name;
   final VoidCallback onShare;
   final bool sharing;
-  const _PremiumAppBar({required this.name, required this.onShare, required this.sharing});
+  const _PremiumAppBar(
+      {required this.name, required this.onShare, required this.sharing});
 
   @override
   Widget build(BuildContext context) {
@@ -252,11 +267,16 @@ class _PremiumAppBar extends StatelessWidget {
                 textAlign: TextAlign.center),
           ),
           sharing
-              ? const SizedBox(width: 20, height: 20,
-                  child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.gold))
+              ? const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                      strokeWidth: 2, color: AppColors.gold))
               : IconButton(
-                  icon: const Icon(Icons.picture_as_pdf_outlined, size: 20, color: AppColors.gold),
-                  onPressed: onShare, tooltip: 'PDF Rapor'),
+                  icon: const Icon(Icons.picture_as_pdf_outlined,
+                      size: 20, color: AppColors.gold),
+                  onPressed: onShare,
+                  tooltip: 'PDF Rapor'),
           const HomeButton(),
         ],
       ),
@@ -303,7 +323,7 @@ class _SummaryCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 14),
-          Text(analysis.overallSummary, style: AppTextStyles.bodyLarge),
+          Text(analysis.resolvedOverallSummary, style: AppTextStyles.bodyLarge),
         ],
       ),
     );

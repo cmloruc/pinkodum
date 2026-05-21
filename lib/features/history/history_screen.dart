@@ -11,6 +11,7 @@ import '../../data/models/person_analysis.dart';
 import '../../data/models/person_premium_analysis.dart';
 import '../../data/models/relationship_analysis.dart';
 import '../../data/models/relationship_premium_analysis.dart';
+import '../../data/repositories/analysis_repository.dart';
 import '../../data/repositories/repository_provider.dart';
 
 class HistoryScreen extends StatefulWidget {
@@ -37,40 +38,88 @@ class _HistoryScreenState extends State<HistoryScreen>
   }
 
   Future<void> _load() async {
-    final repo = await getRepository();
-    final persons = await repo.getPersonAnalyses();
-    final rels = await repo.getRelationshipAnalyses();
-    final premiums = await repo.getPremiumAnalyses();
-    final relPremiums = await repo.getRelationshipPremiumAnalyses();
-    if (mounted) {
-      setState(() {
-        _persons = persons;
-        _relationships = rels;
-        _premiums = premiums;
-        _relPremiums = relPremiums;
-        _loading = false;
-      });
+    try {
+      final repo = await getRepository();
+      final persons = await repo.getPersonAnalyses();
+      final rels = await repo.getRelationshipAnalyses();
+      final premiums = await repo.getPremiumAnalyses();
+      final relPremiums = await repo.getRelationshipPremiumAnalyses();
+      if (mounted) {
+        setState(() {
+          _persons = persons;
+          _relationships = rels;
+          _premiums = premiums;
+          _relPremiums = relPremiums;
+          _loading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _loading = false);
+        _showError(e.toString().replaceFirst('Exception: ', ''));
+      }
     }
   }
 
-  Future<void> _deletePerson(String id) async {
-    await (await getRepository()).deletePersonAnalysis(id);
-    if (mounted) setState(() => _persons.removeWhere((e) => e.id == id));
+  Future<bool> _deletePerson(PersonAnalysis item) async {
+    return _deleteItem(
+      action: (repo) => repo.deletePersonAnalysis(item.id),
+      removeLocal: () => _removeFirst(_persons, (e) => e.id == item.id),
+    );
   }
 
-  Future<void> _deleteRelationship(String id) async {
-    await (await getRepository()).deleteRelationshipAnalysis(id);
-    if (mounted) setState(() => _relationships.removeWhere((e) => e.id == id));
+  Future<bool> _deleteRelationship(RelationshipAnalysis item) async {
+    return _deleteItem(
+      action: (repo) => repo.deleteRelationshipAnalysis(item.id),
+      removeLocal: () => _removeFirst(_relationships, (e) => e.id == item.id),
+    );
   }
 
-  Future<void> _deletePremium(String id) async {
-    await (await getRepository()).deletePremiumAnalysis(id);
-    if (mounted) setState(() => _premiums.removeWhere((e) => e.id == id));
+  Future<bool> _deletePremium(PersonPremiumAnalysis item) async {
+    return _deleteItem(
+      action: (repo) => repo.deletePremiumAnalysis(item.id),
+      removeLocal: () => _removeFirst(_premiums, (e) => e.id == item.id),
+    );
   }
 
-  Future<void> _deleteRelPremium(String id) async {
-    await (await getRepository()).deleteRelationshipPremiumAnalysis(id);
-    if (mounted) setState(() => _relPremiums.removeWhere((e) => e.id == id));
+  Future<bool> _deleteRelPremium(RelationshipPremiumAnalysis item) async {
+    return _deleteItem(
+      action: (repo) => repo.deleteRelationshipPremiumAnalysis(item.id),
+      removeLocal: () => _removeFirst(_relPremiums, (e) => e.id == item.id),
+    );
+  }
+
+  Future<bool> _deleteItem({
+    required Future<void> Function(AnalysisRepository repo) action,
+    required VoidCallback removeLocal,
+  }) async {
+    try {
+      final repo = await getRepository();
+      await action(repo);
+      if (mounted) {
+        setState(removeLocal);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Analiz silindi.')),
+        );
+      }
+      return true;
+    } catch (e) {
+      if (mounted) {
+        _showError(e.toString().replaceFirst('Exception: ', ''));
+      }
+      return false;
+    }
+  }
+
+  void _removeFirst<T>(List<T> items, bool Function(T item) test) {
+    final index = items.indexWhere(test);
+    if (index != -1) items.removeAt(index);
+  }
+
+  void _showError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
   }
 
   @override
@@ -83,14 +132,12 @@ class _HistoryScreenState extends State<HistoryScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration:
-            const BoxDecoration(gradient: AppColors.backgroundGradient),
+        decoration: const BoxDecoration(gradient: AppColors.backgroundGradient),
         child: SafeArea(
           child: Column(
             children: [
               Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 child: Row(
                   children: [
                     IconButton(
@@ -125,15 +172,18 @@ class _HistoryScreenState extends State<HistoryScreen>
               Expanded(
                 child: _loading
                     ? const Center(
-                        child: CircularProgressIndicator(
-                            color: AppColors.gold))
+                        child: CircularProgressIndicator(color: AppColors.gold))
                     : TabBarView(
                         controller: _tabController,
                         children: [
                           _PersonList(items: _persons, onDelete: _deletePerson),
-                          _RelationshipList(items: _relationships, onDelete: _deleteRelationship),
-                          _PremiumList(items: _premiums, onDelete: _deletePremium),
-                          _RelPremiumList(items: _relPremiums, onDelete: _deleteRelPremium),
+                          _RelationshipList(
+                              items: _relationships,
+                              onDelete: _deleteRelationship),
+                          _PremiumList(
+                              items: _premiums, onDelete: _deletePremium),
+                          _RelPremiumList(
+                              items: _relPremiums, onDelete: _deleteRelPremium),
                         ],
                       ),
               ),
@@ -156,16 +206,14 @@ class _EmptyState extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(Icons.inbox_outlined,
-              size: 56,
-              color: AppColors.textMuted.withValues(alpha: 0.5)),
+              size: 56, color: AppColors.textMuted.withValues(alpha: 0.5)),
           const SizedBox(height: 16),
           Text(AppStrings.historyEmpty,
-              style: AppTextStyles.titleMedium.copyWith(
-                  color: AppColors.textMuted)),
+              style: AppTextStyles.titleMedium
+                  .copyWith(color: AppColors.textMuted)),
           const SizedBox(height: 8),
           Text(AppStrings.historyEmptyDesc,
-              style: AppTextStyles.bodySmall,
-              textAlign: TextAlign.center),
+              style: AppTextStyles.bodySmall, textAlign: TextAlign.center),
         ],
       ),
     );
@@ -175,7 +223,7 @@ class _EmptyState extends StatelessWidget {
 // ─── Tekil analizler ─────────────────────────────────────────────────────────
 class _PersonList extends StatelessWidget {
   final List<PersonAnalysis> items;
-  final Future<void> Function(String id) onDelete;
+  final Future<bool> Function(PersonAnalysis item) onDelete;
   const _PersonList({required this.items, required this.onDelete});
 
   @override
@@ -188,16 +236,21 @@ class _PersonList extends StatelessWidget {
       itemBuilder: (context, i) {
         final item = items[i];
         return Dismissible(
-          key: ValueKey(item.id),
+          key:
+              ValueKey('single-${item.id}-${item.createdAt.toIso8601String()}'),
           direction: DismissDirection.endToStart,
           background: _DeleteBackground(),
-          onDismissed: (_) => onDelete(item.id),
+          confirmDismiss: (_) => onDelete(item),
           child: GradientCard(
-            onTap: () => context.push(AppRoutes.singleResult, extra: item),
+            onTap: () => context.push(
+              AppRoutes.singleResult,
+              extra: AnalysisRouteArgs(analysis: item, saveOnOpen: false),
+            ),
             padding: const EdgeInsets.all(16),
             child: Row(
               children: [
-                _HistoryAvatar(icon: Icons.person_outline, color: AppColors.gold),
+                const _HistoryAvatar(
+                    icon: Icons.person_outline, color: AppColors.gold),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(
@@ -214,7 +267,8 @@ class _PersonList extends StatelessWidget {
                     ],
                   ),
                 ),
-                const Icon(Icons.chevron_right, color: AppColors.textMuted, size: 18),
+                const Icon(Icons.chevron_right,
+                    color: AppColors.textMuted, size: 18),
               ],
             ),
           ),
@@ -227,7 +281,7 @@ class _PersonList extends StatelessWidget {
 // ─── İlişki analizleri ───────────────────────────────────────────────────────
 class _RelationshipList extends StatelessWidget {
   final List<RelationshipAnalysis> items;
-  final Future<void> Function(String id) onDelete;
+  final Future<bool> Function(RelationshipAnalysis item) onDelete;
   const _RelationshipList({required this.items, required this.onDelete});
 
   @override
@@ -240,17 +294,22 @@ class _RelationshipList extends StatelessWidget {
       itemBuilder: (context, i) {
         final item = items[i];
         return Dismissible(
-          key: ValueKey(item.id),
+          key: ValueKey(
+              'relationship-${item.id}-${item.createdAt.toIso8601String()}'),
           direction: DismissDirection.endToStart,
           background: _DeleteBackground(),
-          onDismissed: (_) => onDelete(item.id),
+          confirmDismiss: (_) => onDelete(item),
           child: GradientCard(
-            onTap: () => context.push(AppRoutes.relationshipResult, extra: item),
+            onTap: () => context.push(
+              AppRoutes.relationshipResult,
+              extra: AnalysisRouteArgs(analysis: item, saveOnOpen: false),
+            ),
             borderColor: AppColors.purple.withValues(alpha: 0.25),
             padding: const EdgeInsets.all(16),
             child: Row(
               children: [
-                _HistoryAvatar(icon: Icons.favorite_outline, color: AppColors.purple),
+                const _HistoryAvatar(
+                    icon: Icons.favorite_outline, color: AppColors.purple),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(
@@ -259,14 +318,16 @@ class _RelationshipList extends StatelessWidget {
                       Text(item.title, style: AppTextStyles.titleMedium),
                       const SizedBox(height: 2),
                       Text(item.relationshipType,
-                          style: AppTextStyles.bodySmall.copyWith(color: AppColors.purpleLight)),
+                          style: AppTextStyles.bodySmall
+                              .copyWith(color: AppColors.purpleLight)),
                       const SizedBox(height: 2),
                       Text(DateFormatter.formatRelative(item.createdAt),
                           style: AppTextStyles.bodySmall),
                     ],
                   ),
                 ),
-                const Icon(Icons.chevron_right, color: AppColors.textMuted, size: 18),
+                const Icon(Icons.chevron_right,
+                    color: AppColors.textMuted, size: 18),
               ],
             ),
           ),
@@ -279,7 +340,7 @@ class _RelationshipList extends StatelessWidget {
 // ─── Detaylı (premium) analizler ─────────────────────────────────────────────
 class _PremiumList extends StatelessWidget {
   final List<PersonPremiumAnalysis> items;
-  final Future<void> Function(String id) onDelete;
+  final Future<bool> Function(PersonPremiumAnalysis item) onDelete;
   const _PremiumList({required this.items, required this.onDelete});
 
   @override
@@ -292,10 +353,11 @@ class _PremiumList extends StatelessWidget {
       itemBuilder: (context, i) {
         final item = items[i];
         return Dismissible(
-          key: ValueKey(item.id),
+          key: ValueKey(
+              'single-premium-${item.id}-${item.createdAt.toIso8601String()}'),
           direction: DismissDirection.endToStart,
           background: _DeleteBackground(),
-          onDismissed: (_) => onDelete(item.id),
+          confirmDismiss: (_) => onDelete(item),
           child: GradientCard(
             onTap: () => context.push(AppRoutes.premiumResult, extra: item),
             borderColor: AppColors.gold.withValues(alpha: 0.3),
@@ -306,7 +368,8 @@ class _PremiumList extends StatelessWidget {
             padding: const EdgeInsets.all(16),
             child: Row(
               children: [
-                _HistoryAvatar(icon: Icons.auto_awesome, color: AppColors.gold),
+                const _HistoryAvatar(
+                    icon: Icons.auto_awesome, color: AppColors.gold),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(
@@ -317,14 +380,17 @@ class _PremiumList extends StatelessWidget {
                           Text(item.name, style: AppTextStyles.titleMedium),
                           const SizedBox(width: 8),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 6, vertical: 2),
                             decoration: BoxDecoration(
                               color: AppColors.gold.withValues(alpha: 0.15),
                               borderRadius: BorderRadius.circular(4),
                             ),
                             child: Text('Detaylı',
                                 style: AppTextStyles.bodySmall.copyWith(
-                                    color: AppColors.gold, fontSize: 10, fontWeight: FontWeight.bold)),
+                                    color: AppColors.gold,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.bold)),
                           ),
                         ],
                       ),
@@ -338,7 +404,8 @@ class _PremiumList extends StatelessWidget {
                     ],
                   ),
                 ),
-                const Icon(Icons.chevron_right, color: AppColors.textMuted, size: 18),
+                const Icon(Icons.chevron_right,
+                    color: AppColors.textMuted, size: 18),
               ],
             ),
           ),
@@ -372,7 +439,7 @@ class _HistoryAvatar extends StatelessWidget {
 // ─── Detaylı ilişki analizleri ────────────────────────────────────────────────
 class _RelPremiumList extends StatelessWidget {
   final List<RelationshipPremiumAnalysis> items;
-  final Future<void> Function(String id) onDelete;
+  final Future<bool> Function(RelationshipPremiumAnalysis item) onDelete;
   const _RelPremiumList({required this.items, required this.onDelete});
 
   @override
@@ -385,10 +452,11 @@ class _RelPremiumList extends StatelessWidget {
       itemBuilder: (context, i) {
         final item = items[i];
         return Dismissible(
-          key: ValueKey(item.id),
+          key: ValueKey(
+              'relationship-premium-${item.id}-${item.createdAt.toIso8601String()}'),
           direction: DismissDirection.endToStart,
           background: _DeleteBackground(),
-          onDismissed: (_) => onDelete(item.id),
+          confirmDismiss: (_) => onDelete(item),
           child: GradientCard(
             onTap: () => context.push(AppRoutes.relPremiumResult, extra: item),
             borderColor: AppColors.purple.withValues(alpha: 0.3),
@@ -399,7 +467,8 @@ class _RelPremiumList extends StatelessWidget {
             padding: const EdgeInsets.all(16),
             child: Row(
               children: [
-                _HistoryAvatar(icon: Icons.favorite, color: AppColors.purple),
+                const _HistoryAvatar(
+                    icon: Icons.favorite, color: AppColors.purple),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(
@@ -409,26 +478,31 @@ class _RelPremiumList extends StatelessWidget {
                         Text(item.title, style: AppTextStyles.titleMedium),
                         const SizedBox(width: 8),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 6, vertical: 2),
                           decoration: BoxDecoration(
                             color: AppColors.purple.withValues(alpha: 0.15),
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Text('Detaylı',
                               style: AppTextStyles.bodySmall.copyWith(
-                                  color: AppColors.purpleLight, fontSize: 10, fontWeight: FontWeight.bold)),
+                                  color: AppColors.purpleLight,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold)),
                         ),
                       ]),
                       const SizedBox(height: 2),
                       Text(item.relationshipType,
-                          style: AppTextStyles.bodySmall.copyWith(color: AppColors.purpleLight)),
+                          style: AppTextStyles.bodySmall
+                              .copyWith(color: AppColors.purpleLight)),
                       const SizedBox(height: 2),
                       Text(DateFormatter.formatRelative(item.createdAt),
                           style: AppTextStyles.bodySmall),
                     ],
                   ),
                 ),
-                const Icon(Icons.chevron_right, color: AppColors.textMuted, size: 18),
+                const Icon(Icons.chevron_right,
+                    color: AppColors.textMuted, size: 18),
               ],
             ),
           ),

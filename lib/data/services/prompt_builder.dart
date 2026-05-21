@@ -242,6 +242,45 @@ Sadece şu JSON alanlarını üret:
 }''';
   }
 
+  static String premiumSingleMissingFields({
+    required String name,
+    required String birthDate,
+    required List<int> pinCode,
+    required ElementBalance elementBalance,
+    required int currentYear,
+    required List<String> missingFields,
+  }) {
+    final fieldDescriptions = {
+      'h1Personality': 'kişilik enerjisi',
+      'h2Social': 'sosyal bilinç ve ilişkilerde görünme biçimi',
+      'h3Global': 'vizyon, büyük resim ve dünyayla bağlantı kurma biçimi',
+      'h4LifeCycle': 'yaşam döngüsü ve tekrar eden kalıplar',
+      'h5Lesson': 'ders ve potansiyel alanı',
+      'h6InnerSelf': 'içsel benlik ve görünmeyen motivasyon',
+      'h7InnerChild': 'içsel çocuk, temel ihtiyaç ve hassasiyet',
+      'h8Soul': 'ruh duygusu, değer algısı ve içsel güç',
+      'h9Universe': 'tamamlanma, kabulleniş ve büyük anlam',
+      'elementDetail': 'element dengesi sentezi',
+      'lifeLesson': 'tüm haritadan çıkan yaşam dersi',
+      'yearMessage': '$currentYear yılı için fırsat, risk, odak ve öneri',
+      'overallSummary': 'tüm raporu bütünleştiren genel özet',
+    };
+    final jsonShape = missingFields
+        .map((field) =>
+            '  "$field":"${fieldDescriptions[field] ?? field} alanını $name için doğal, eksiksiz ve kişisel yorumla."')
+        .join(',\n');
+
+    return '''
+$name için premium tek kişi analizinde eksik kalan alanları tamamla.
+${_premiumSingleBaseRules(name: name, birthDate: birthDate, pinCode: pinCode, elementBalance: elementBalance)}
+Yıl: $currentYear
+
+Sadece eksik alanları üret. Başka alan ekleme.
+{
+$jsonShape
+}''';
+  }
+
   // ─── Premium İlişki Analizi ───────────────────────────────────────────────
   static String _premiumRelationshipBaseRules({
     required String name1,

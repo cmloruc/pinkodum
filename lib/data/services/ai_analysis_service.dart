@@ -70,7 +70,7 @@ class AiAnalysisService implements AnalysisService {
         createdAt: DateTime.now(),
       );
     } catch (e) {
-      throw Exception('AI tekil analiz üretilemedi: $e');
+      throw Exception(_analysisErrorMessage(e));
     }
   }
 
@@ -136,7 +136,7 @@ class AiAnalysisService implements AnalysisService {
             includeSexual ? texts['sexualCompatibility'] : null,
       );
     } catch (e) {
-      throw Exception('AI ilişki analizi üretilemedi: $e');
+      throw Exception(_analysisErrorMessage(e));
     }
   }
 
@@ -343,6 +343,45 @@ class AiAnalysisService implements AnalysisService {
       ..._parseJson(firstParts[1]),
       ..._parseJson(soulData),
     };
+    _applyTextAliases(texts);
+
+    const requiredFields = [
+      'h1Personality',
+      'h2Social',
+      'h3Global',
+      'h4LifeCycle',
+      'h5Lesson',
+      'h6InnerSelf',
+      'h7InnerChild',
+      'h8Soul',
+      'h9Universe',
+      'elementDetail',
+      'lifeLesson',
+      'yearMessage',
+      'overallSummary',
+    ];
+    final missingFields = requiredFields
+        .where((field) => (texts[field] ?? '').trim().isEmpty)
+        .toList();
+    if (missingFields.isNotEmpty) {
+      final missingData = await _callApi(
+        PromptBuilder.premiumSingleMissingFields(
+          name: name,
+          birthDate: birthDateStr,
+          pinCode: pin,
+          elementBalance: elementBalance,
+          currentYear: currentYear,
+          missingFields: missingFields,
+        ),
+        maxTokens: 1800,
+      );
+      texts.addAll(_parseJson(missingData));
+      _applyTextAliases(texts);
+    }
+
+    final overallSummary = (texts['overallSummary'] ?? '').trim().isEmpty
+        ? _fallbackOverallSummary(name, texts)
+        : texts['overallSummary']!;
 
     return PersonPremiumAnalysis(
       id: _uuid.v4(),
@@ -361,7 +400,7 @@ class AiAnalysisService implements AnalysisService {
       elementDetail: texts['elementDetail'] ?? '',
       lifeLesson: texts['lifeLesson'] ?? '',
       yearMessage: texts['yearMessage'] ?? '',
-      overallSummary: texts['overallSummary'] ?? '',
+      overallSummary: overallSummary,
       createdAt: DateTime.now(),
     );
   }
@@ -378,26 +417,31 @@ class AiAnalysisService implements AnalysisService {
     return _callBackendProxy(userMessage, maxTokens: maxTokens);
   }
 
-  Future<String> _callBackendProxy(String userMessage, {int maxTokens = 1024}) async {
+  Future<String> _callBackendProxy(String userMessage,
+      {int maxTokens = 1024}) async {
     final prefs = await SharedPreferences.getInstance();
     final auth = AuthService(prefs);
 
     if (!auth.isLoggedIn) {
-      throw Exception('Analiz yapmak için giriş yapman gerekiyor.');
+      throw Exception('Analiz için giriş yapılması gerekiyor.');
     }
 
-    final response = await http.post(
-      Uri.parse('${AppConfig.backendBaseUrl}/ai/query'),
-      headers: {
-        'content-type': 'application/json',
-        'authorization': 'Bearer ${auth.token}',
-      },
-      body: jsonEncode({'userMessage': userMessage, 'maxTokens': maxTokens}),
-    ).timeout(const Duration(seconds: 120));
+    final response = await http
+        .post(
+          Uri.parse('${AppConfig.backendBaseUrl}/ai/query'),
+          headers: {
+            'content-type': 'application/json',
+            'authorization': 'Bearer ${auth.token}',
+          },
+          body:
+              jsonEncode({'userMessage': userMessage, 'maxTokens': maxTokens}),
+        )
+        .timeout(const Duration(seconds: 120));
 
     if (response.statusCode != 201 && response.statusCode != 200) {
       final body = jsonDecode(response.body) as Map<String, dynamic>;
-      throw Exception(body['message'] ?? 'AI sorgu hatası: ${response.statusCode}');
+      throw Exception(
+          body['message'] ?? 'AI sorgu hatası: ${response.statusCode}');
     }
 
     final decoded = jsonDecode(response.body) as Map<String, dynamic>;
@@ -550,6 +594,14 @@ class AiAnalysisService implements AnalysisService {
     return trimmed.length > 240 ? '${trimmed.substring(0, 240)}...' : trimmed;
   }
 
+  String _analysisErrorMessage(Object error) {
+    final message = error.toString().replaceFirst('Exception: ', '').trim();
+    if (message == 'Analiz için giriş yapılması gerekiyor.') {
+      return message;
+    }
+    return 'Analiz oluşturulamadı. Lütfen bağlantını kontrol edip tekrar dene.';
+  }
+
   String _sanitizeText(String text) {
     return text
         .replaceAll(RegExp(r'\bH[1-9]\s*=\s*\d+\s*,?\s*'), '')
@@ -581,6 +633,47 @@ class AiAnalysisService implements AnalysisService {
       if (loose.isNotEmpty) return loose;
       rethrow;
     }
+  }
+
+  void _applyTextAliases(Map<String, String> texts) {
+    const aliases = {
+      'overall_summary': 'overallSummary',
+      'generalSummary': 'overallSummary',
+      'summary': 'overallSummary',
+      'element_detail': 'elementDetail',
+      'life_lesson': 'lifeLesson',
+      'year_message': 'yearMessage',
+    };
+
+    for (final entry in aliases.entries) {
+      final aliasValue = texts[entry.key];
+      final canonicalValue = texts[entry.value];
+      if ((canonicalValue == null || canonicalValue.trim().isEmpty) &&
+          aliasValue != null &&
+          aliasValue.trim().isNotEmpty) {
+        texts[entry.value] = aliasValue;
+      }
+    }
+  }
+
+  String _fallbackOverallSummary(String name, Map<String, String> texts) {
+    final parts = [
+      texts['elementDetail'],
+      texts['lifeLesson'],
+      texts['yearMessage'],
+    ]
+        .where((text) => text != null && text.trim().isNotEmpty)
+        .map((text) => text!.trim())
+        .toList();
+
+    if (parts.isEmpty) {
+      return '$name, bu detaylı rapor pin kodundaki ana temaların birlikte okunmasıyla oluşur. Güçlü taraflarını bilinçli kullanman, zorlandığın tekrarları fark etmen ve seçimlerini daha sakin bir yerden yapman bu haritanın ana davetidir.';
+    }
+
+    final joined = parts.join(' ');
+    return joined.length <= 520
+        ? joined
+        : '${joined.substring(0, 520).trim()}...';
   }
 
   Map<String, String> _parseLooseJsonObject(String raw) {

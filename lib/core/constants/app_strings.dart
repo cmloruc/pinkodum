@@ -28,7 +28,8 @@ class AppStrings {
   static const String homeSingleAnalysis = 'Tek Kişi Analizi';
   static const String homeSingleAnalysisDesc = 'Kendi pin kodunu hesapla';
   static const String homeRelationshipAnalysis = 'İlişki Analizi';
-  static const String homeRelationshipAnalysisDesc = 'İki kişi arasındaki enerjiyi keşfet';
+  static const String homeRelationshipAnalysisDesc =
+      'İki kişi arasındaki enerjiyi keşfet';
   static const String homeDailyInsight = 'Günlük İçgörü';
   static const String homeDailyInsightDesc = 'Bugünkü mesajını al';
   static const String homeHistory = 'Geçmiş Analizler';
@@ -47,7 +48,8 @@ class AppStrings {
   static const String btnCalculate = 'Pin Kodumu Hesapla';
   static const String btnCalculateRelationship = 'İlişki Kodunu Hesapla';
   static const String btnOpenDetailed = 'Detaylı Analizi Aç';
-  static const String btnOpenRelationshipDetailed = 'Detaylı İlişki Analizini Aç';
+  static const String btnOpenRelationshipDetailed =
+      'Detaylı İlişki Analizini Aç';
   static const String btnSaveToHistory = 'Geçmişe Kaydet';
   static const String btnSaved = 'Kaydedildi ✓';
   static const String btnNewAnalysis = 'Yeni Analiz';
@@ -56,7 +58,8 @@ class AppStrings {
   static const String validationNameRequired = 'İsim boş bırakılamaz';
   static const String validationDateRequired = 'Doğum tarihi seçilmelidir';
   static const String validationFutureDate = 'Gelecek tarih seçilemez';
-  static const String validationRelationshipRequired = 'İlişki türü seçilmelidir';
+  static const String validationRelationshipRequired =
+      'İlişki türü seçilmelidir';
 
   // Analiz Sonucu
   static const String resultPinCode = 'Pin Kodun';
@@ -84,20 +87,23 @@ class AppStrings {
   static const String historySingleTab = 'Tek Kişi';
   static const String historyRelationshipTab = 'İlişki';
   static const String historyEmpty = 'Henüz analiz yapılmadı';
-  static const String historyEmptyDesc = 'İlk analizini yapmak için ana sayfaya dön';
+  static const String historyEmptyDesc =
+      'İlk analizini yapmak için ana sayfaya dön';
 
   // Premium
   static const String premiumTitle = 'Premium\'a Geç';
-  static const String premiumSubtitle = 'Detaylı analizlerle kendini daha derinlemesine keşfet';
+  static const String premiumSubtitle =
+      'Detaylı analizlerle kendini daha derinlemesine keşfet';
   static const String premiumSingleDetail = 'Tek Kişi Detaylı Analiz';
   static const String premiumRelationshipDetail = 'İlişki Detaylı Analiz';
   static const String premiumMonthly = 'Aylık Premium';
   static const String premiumYearly = 'Yıllık Premium';
-  static const String premiumMockNotice = 'Bu ekran geliştirme aşamasındadır. Yakında gerçek ödeme sistemi aktif olacak.';
+  static const String premiumMockNotice =
+      'Bu ekran geliştirme aşamasındadır. Yakında gerçek ödeme sistemi aktif olacak.';
 
   // Fiyatlar (kolayca değiştirilebilir)
-  static const String priceSingleDetail = '99 ₺';
-  static const String priceRelationshipDetail = '149 ₺';
+  static const String priceSingleDetail = '2 kredi';
+  static const String priceRelationshipDetail = '3 kredi';
   static const String priceMonthly = '199 ₺ / ay';
   static const String priceYearly = '999 ₺ / yıl';
 
@@ -106,7 +112,8 @@ class AppStrings {
   static const String insightWeeklyTheme = 'Bu Haftanın Teması';
   static const String insightAffirmation = 'Günlük Olumlama';
   static const String insightPremiumTeaser = 'Detaylı Haftalık Yorum';
-  static const String insightPremiumLocked = 'Bu içerik Premium üyelerine özeldir';
+  static const String insightPremiumLocked =
+      'Bu içerik Premium üyelerine özeldir';
 
   // Ayarlar
   static const String settingsTitle = 'Ayarlar';

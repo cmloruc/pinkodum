@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../app/router.dart';
@@ -8,6 +9,7 @@ import '../../data/models/person_analysis.dart';
 import '../../data/repositories/repository_provider.dart';
 import '../../data/services/ai_analysis_service.dart';
 import '../../data/services/api_key_service.dart';
+import '../../data/services/purchase_service.dart';
 
 class PremiumLoadingScreen extends StatefulWidget {
   final PersonAnalysis analysis;
@@ -22,7 +24,6 @@ class _PremiumLoadingScreenState extends State<PremiumLoadingScreen>
   late AnimationController _controller;
   late Animation<double> _pulse;
   int _messageIndex = 0;
-  bool _started = false;
 
   static const _messages = [
     'Sayıların derinliklerine iniliyor...',
@@ -63,7 +64,6 @@ class _PremiumLoadingScreenState extends State<PremiumLoadingScreen>
   }
 
   Future<void> _startAnalysis() async {
-    setState(() => _started = true);
     try {
       final prefs = await SharedPreferences.getInstance();
       final keyService = ApiKeyService(prefs);
@@ -73,6 +73,10 @@ class _PremiumLoadingScreenState extends State<PremiumLoadingScreen>
         name: widget.analysis.name,
         birthDate: widget.analysis.birthDate,
       );
+
+      if (!kIsWeb) {
+        await PurchaseService().consumeAnalysisAccess('single');
+      }
 
       final repo = await getRepository();
       await repo.savePremiumAnalysis(premium);
@@ -113,106 +117,113 @@ class _PremiumLoadingScreenState extends State<PremiumLoadingScreen>
           ),
         ),
         child: SafeArea(
-          child: Center(
-            child: Padding(
-              padding: const EdgeInsets.all(32),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Animasyonlu daire
-                  ScaleTransition(
-                    scale: _pulse,
-                    child: Container(
-                      width: 120,
-                      height: 120,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        gradient: AppColors.goldGradient,
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppColors.gold.withValues(alpha: 0.4),
-                            blurRadius: 40,
-                            spreadRadius: 8,
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return SingleChildScrollView(
+                padding: const EdgeInsets.all(32),
+                child: ConstrainedBox(
+                  constraints:
+                      BoxConstraints(minHeight: constraints.maxHeight - 64),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // Animasyonlu daire
+                      ScaleTransition(
+                        scale: _pulse,
+                        child: Container(
+                          width: 120,
+                          height: 120,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            gradient: AppColors.goldGradient,
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppColors.gold.withValues(alpha: 0.4),
+                                blurRadius: 40,
+                                spreadRadius: 8,
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                      child: const Icon(
-                        Icons.auto_awesome,
-                        size: 52,
-                        color: AppColors.background,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 48),
-                  Text(
-                    'Detaylı Analiz',
-                    style: AppTextStyles.displayMedium,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    widget.analysis.name,
-                    style: AppTextStyles.headlineMedium
-                        .copyWith(color: AppColors.textSecondary),
-                  ),
-                  const SizedBox(height: 48),
-                  // Dönen mesaj
-                  AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 500),
-                    child: Text(
-                      _messages[_messageIndex],
-                      key: ValueKey(_messageIndex),
-                      style: AppTextStyles.bodyLarge.copyWith(
-                        color: AppColors.gold,
-                        fontStyle: FontStyle.italic,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 12),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 12,
-                    ),
-                    decoration: BoxDecoration(
-                      color: AppColors.gold.withValues(alpha: 0.08),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: AppColors.gold.withValues(alpha: 0.22),
-                      ),
-                    ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Icon(Icons.info_outline,
-                            size: 18, color: AppColors.gold),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: Text(
-                            'Detaylı analiz 1-2 dakika sürebilir. Lütfen uygulamayı kapatmayın ve ekrandan ayrılmayın.',
-                            style: AppTextStyles.bodySmall.copyWith(
-                              color: AppColors.textSecondary,
-                            ),
+                          child: const Icon(
+                            Icons.auto_awesome,
+                            size: 52,
+                            color: AppColors.background,
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                      const SizedBox(height: 48),
+                      Text(
+                        'Detaylı Analiz',
+                        style: AppTextStyles.displayMedium,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        widget.analysis.name,
+                        style: AppTextStyles.headlineMedium
+                            .copyWith(color: AppColors.textSecondary),
+                      ),
+                      const SizedBox(height: 48),
+                      // Dönen mesaj
+                      AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 500),
+                        child: Text(
+                          _messages[_messageIndex],
+                          key: ValueKey(_messageIndex),
+                          style: AppTextStyles.bodyLarge.copyWith(
+                            color: AppColors.gold,
+                            fontStyle: FontStyle.italic,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 12),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.gold.withValues(alpha: 0.08),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: AppColors.gold.withValues(alpha: 0.22),
+                          ),
+                        ),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Icon(Icons.info_outline,
+                                size: 18, color: AppColors.gold),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Text(
+                                'Detaylı analiz 1-2 dakika sürebilir. Lütfen uygulamayı kapatmayın ve ekrandan ayrılmayın.',
+                                style: AppTextStyles.bodySmall.copyWith(
+                                  color: AppColors.textSecondary,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      // İnce progress bar
+                      SizedBox(
+                        width: 200,
+                        child: LinearProgressIndicator(
+                          backgroundColor:
+                              AppColors.gold.withValues(alpha: 0.15),
+                          valueColor: const AlwaysStoppedAnimation<Color>(
+                              AppColors.gold),
+                          minHeight: 2,
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 24),
-                  // İnce progress bar
-                  SizedBox(
-                    width: 200,
-                    child: LinearProgressIndicator(
-                      backgroundColor: AppColors.gold.withValues(alpha: 0.15),
-                      valueColor:
-                          const AlwaysStoppedAnimation<Color>(AppColors.gold),
-                      minHeight: 2,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+                ),
+              );
+            },
           ),
         ),
       ),

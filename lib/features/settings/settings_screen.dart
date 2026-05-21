@@ -11,6 +11,7 @@ import '../../core/widgets/custom_button.dart';
 import '../../core/widgets/gradient_card.dart';
 import '../../data/services/api_key_service.dart';
 import '../../data/services/auth_service.dart';
+import '../../data/services/feedback_service.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -30,8 +31,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
   String? _saveStatus;
   AuthUser? _authUser;
   bool _loggingOut = false;
-  int _devTapCount = 0;
-  bool _devModeUnlocked = false;
 
   @override
   void initState() {
@@ -44,6 +43,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
       final prefs = await SharedPreferences.getInstance();
       final svc = ApiKeyService(prefs);
       final auth = AuthService(prefs);
+      var authUser = auth.currentUser;
+      if (auth.isLoggedIn) {
+        authUser = await auth.fetchMe() ?? authUser;
+      }
       if (mounted) {
         setState(() {
           _apiKeyService = svc;
@@ -51,7 +54,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           _apiKeyController.text = svc.apiKey;
           _selectedModel = svc.model;
           _apiKeyLoaded = true;
-          _authUser = auth.currentUser;
+          _authUser = authUser;
         });
       }
     } catch (_) {
@@ -59,36 +62,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
-  void _onVersionTap() {
-    _devTapCount++;
-    if (_devTapCount >= 5 && !_devModeUnlocked) {
-      setState(() => _devModeUnlocked = true);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Geliştirici modu aktif'),
-          backgroundColor: AppColors.surface,
-          duration: Duration(seconds: 2),
-        ),
-      );
-    } else if (!_devModeUnlocked) {
-      final kalan = 5 - _devTapCount;
-      if (kalan <= 3) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Geliştirici moduna $kalan adım kaldı'),
-            backgroundColor: AppColors.surface,
-            duration: const Duration(seconds: 1),
-          ),
-        );
-      }
-    }
-  }
-
   Future<void> _logout() async {
     setState(() => _loggingOut = true);
     final prefs = await SharedPreferences.getInstance();
     await AuthService(prefs).logout();
-    if (mounted) setState(() { _authUser = null; _loggingOut = false; });
+    if (mounted) {
+      setState(() {
+        _authUser = null;
+        _loggingOut = false;
+      });
+    }
   }
 
   Future<void> _saveApiKey() async {
@@ -168,7 +151,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       _authUser != null
                           ? GradientCard(
                               padding: const EdgeInsets.all(16),
-                              borderColor: AppColors.gold.withValues(alpha: 0.2),
+                              borderColor:
+                                  AppColors.gold.withValues(alpha: 0.2),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -196,11 +180,117 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                                     AppTextStyles.titleMedium),
                                             Text(_authUser!.email,
                                                 style: AppTextStyles.bodySmall),
+                                            if (_authUser!.birthDate != null)
+                                              Text(
+                                                'Doğum: ${_formatBirthDate(_authUser!.birthDate!)}',
+                                                style: AppTextStyles.bodySmall,
+                                              ),
                                           ],
                                         ),
                                       ),
                                     ],
                                   ),
+                                  if (_authUser!.hasActivePremium) ...[
+                                  const SizedBox(height: 14),
+                                  Container(
+                                    width: double.infinity,
+                                    padding: const EdgeInsets.all(14),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.gold.withValues(alpha: 0.08),
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(color: AppColors.gold.withValues(alpha: 0.22)),
+                                    ),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            const Icon(Icons.star_outline, size: 18, color: AppColors.gold),
+                                            const SizedBox(width: 8),
+                                            Text('Premium Üyelik',
+                                                style: AppTextStyles.labelMedium.copyWith(color: AppColors.gold)),
+                                          ],
+                                        ),
+                                        if (_authUser!.premiumUntil != null) ...[
+                                          const SizedBox(height: 6),
+                                          Text(
+                                            'Bitiş tarihi: ${_formatDate(_authUser!.premiumUntil!)}',
+                                            style: AppTextStyles.bodySmall.copyWith(color: AppColors.textMuted),
+                                          ),
+                                        ],
+                                        const SizedBox(height: 10),
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: _QuotaItem(
+                                                label: 'Tekil Analiz',
+                                                remaining: _authUser!.monthlySingleRemaining,
+                                                total: 10,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 12),
+                                            Expanded(
+                                              child: _QuotaItem(
+                                                label: 'İlişki Analizi',
+                                                remaining: _authUser!.monthlyRelationshipRemaining,
+                                                total: 10,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  ] else if (!(_authUser!.isAdmin)) ...[
+                                  const SizedBox(height: 14),
+                                  Container(
+                                    width: double.infinity,
+                                    padding: const EdgeInsets.all(14),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.gold
+                                          .withValues(alpha: 0.08),
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(
+                                        color: AppColors.gold
+                                            .withValues(alpha: 0.22),
+                                      ),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        const Icon(Icons.toll_outlined,
+                                            size: 20, color: AppColors.gold),
+                                        const SizedBox(width: 10),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text('Kredi Bakiyesi',
+                                                  style: AppTextStyles
+                                                      .labelMedium
+                                                      .copyWith(
+                                                          color:
+                                                              AppColors.gold)),
+                                              const SizedBox(height: 2),
+                                              Text(
+                                                'Detaylı analizlerde kullanılır.',
+                                                style: AppTextStyles.bodySmall,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        Text(
+                                          '${_authUser!.credits} kredi',
+                                          style: AppTextStyles.titleMedium
+                                              .copyWith(
+                                            color: AppColors.textGold,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  ],
                                   const SizedBox(height: 14),
                                   GhostButton(
                                     label: _loggingOut
@@ -243,26 +333,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               ),
                             ),
                       const SizedBox(height: 24),
-                      // ── AI API Bölümü (yalnızca geliştirici modunda) ──
-                      if (_devModeUnlocked) ...[
-                        _SectionHeader('AI API (Geliştirici)'),
+                      // ── Admin Panel (yalnızca admin kullanıcıya görünür) ──
+                      if (_authUser != null && _authUser!.isAdmin) ...[
                         const SizedBox(height: 8),
-                        if (!_apiKeyLoaded)
-                          const Center(
-                            child: CircularProgressIndicator(color: AppColors.gold),
-                          )
-                        else
-                          _ApiKeySection(
-                            controller: _apiKeyController,
-                            selectedProvider: _selectedProvider,
-                            selectedModel: _selectedModel,
-                            onProviderChanged: _changeProvider,
-                            onModelChanged: (m) =>
-                                setState(() => _selectedModel = m!),
-                            onSave: _saveApiKey,
-                            saving: _saving,
-                            saveStatus: _saveStatus,
+                        GradientCard(
+                          padding: EdgeInsets.zero,
+                          borderColor: AppColors.gold.withValues(alpha: 0.3),
+                          child: _ActionTile(
+                            icon: Icons.admin_panel_settings_outlined,
+                            title: 'Admin Panel',
+                            onTap: () => context.push(AppRoutes.admin),
                           ),
+                        ),
                         const SizedBox(height: 24),
                       ],
                       _SectionHeader('Tercihler'),
@@ -290,6 +372,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         ),
                       ),
                       const SizedBox(height: 24),
+                      // ── Geri Bildirim ─────────────────────────────────
+                      if (_authUser != null) ...[
+                        _SectionHeader('Geri Bildirim'),
+                        const SizedBox(height: 12),
+                        GradientCard(
+                          padding: EdgeInsets.zero,
+                          child: _ActionTile(
+                            icon: Icons.feedback_outlined,
+                            title: 'Geri Bildirim Gönder',
+                            onTap: () => _showFeedbackSheet(context),
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                      ],
                       _SectionHeader('Yasal'),
                       const SizedBox(height: 12),
                       GradientCard(
@@ -357,11 +453,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             Text('Pin Kodum',
                                 style: AppTextStyles.headlineMedium),
                             const SizedBox(height: 4),
-                            GestureDetector(
-                              onTap: _onVersionTap,
-                              child: Text(AppStrings.settingsVersion,
-                                  style: AppTextStyles.bodySmall),
-                            ),
+                            Text(AppStrings.settingsVersion,
+                                style: AppTextStyles.bodySmall),
                           ],
                         ),
                       ),
@@ -370,6 +463,140 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               ),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  String _formatBirthDate(DateTime date) {
+    final day = date.day.toString().padLeft(2, '0');
+    final month = date.month.toString().padLeft(2, '0');
+    return '$day.$month.${date.year}';
+  }
+
+  String _formatDate(DateTime date) {
+    final day = date.day.toString().padLeft(2, '0');
+    final month = date.month.toString().padLeft(2, '0');
+    return '$day.$month.${date.year}';
+  }
+
+  void _showFeedbackSheet(BuildContext context) {
+    String selectedType = 'dilek';
+    final messageController = TextEditingController();
+    bool sending = false;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: AppColors.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setModalState) => Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(ctx).viewInsets.bottom,
+          ),
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Center(
+                  child: Container(
+                    width: 40, height: 4,
+                    decoration: BoxDecoration(
+                      color: AppColors.border,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Text('Geri Bildirim Gönder', style: AppTextStyles.headlineLarge),
+                const SizedBox(height: 6),
+                Text('Dilek, şikayet veya talebini iletebilirsin.', style: AppTextStyles.bodySmall),
+                const SizedBox(height: 20),
+                Text('Kategori', style: AppTextStyles.labelMedium),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 8,
+                  children: FeedbackService.types.entries.map((e) {
+                    final selected = selectedType == e.key;
+                    return GestureDetector(
+                      onTap: () => setModalState(() => selectedType = e.key),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: selected ? AppColors.gold.withValues(alpha: 0.15) : AppColors.surfaceLight,
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: selected ? AppColors.gold : AppColors.border,
+                          ),
+                        ),
+                        child: Text(
+                          e.value,
+                          style: AppTextStyles.bodySmall.copyWith(
+                            color: selected ? AppColors.textGold : AppColors.textPrimary,
+                            fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
+                          ),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+                const SizedBox(height: 16),
+                Text('Mesaj', style: AppTextStyles.labelMedium),
+                const SizedBox(height: 8),
+                TextFormField(
+                  controller: messageController,
+                  maxLines: 4,
+                  maxLength: 500,
+                  style: AppTextStyles.bodyMedium,
+                  decoration: const InputDecoration(
+                    hintText: 'Düşüncelerini yaz...',
+                  ),
+                ),
+                const SizedBox(height: 16),
+                SizedBox(
+                  width: double.infinity,
+                  child: GoldButton(
+                    label: sending ? 'Gönderiliyor...' : 'Gönder',
+                    icon: Icons.send_outlined,
+                    loading: sending,
+                    onPressed: sending ? null : () async {
+                      final msg = messageController.text.trim();
+                      if (msg.isEmpty) return;
+                      setModalState(() => sending = true);
+                      try {
+                        await FeedbackService.send(type: selectedType, message: msg);
+                        if (ctx.mounted) {
+                          Navigator.pop(ctx);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Geri bildiriminiz alındı, teşekkürler!'),
+                              backgroundColor: AppColors.surface,
+                            ),
+                          );
+                        }
+                      } catch (_) {
+                        setModalState(() => sending = false);
+                        if (ctx.mounted) {
+                          ScaffoldMessenger.of(ctx).showSnackBar(
+                            const SnackBar(
+                              content: Text('Gönderilemedi, tekrar dene.'),
+                              backgroundColor: AppColors.surface,
+                            ),
+                          );
+                        }
+                      }
+                    },
+                  ),
+                ),
+                const SizedBox(height: 8),
+              ],
+            ),
           ),
         ),
       ),
@@ -413,6 +640,43 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _QuotaItem extends StatelessWidget {
+  final String label;
+  final int remaining;
+  final int total;
+
+  const _QuotaItem({required this.label, required this.remaining, required this.total});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: AppTextStyles.bodySmall),
+        const SizedBox(height: 4),
+        Row(
+          children: [
+            Text('$remaining',
+                style: AppTextStyles.titleMedium.copyWith(color: AppColors.gold, fontWeight: FontWeight.w700)),
+            Text('/$total kaldı',
+                style: AppTextStyles.bodySmall.copyWith(color: AppColors.textMuted)),
+          ],
+        ),
+        const SizedBox(height: 4),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(4),
+          child: LinearProgressIndicator(
+            value: total > 0 ? remaining / total : 0,
+            backgroundColor: AppColors.surfaceLight,
+            valueColor: const AlwaysStoppedAnimation<Color>(AppColors.gold),
+            minHeight: 4,
+          ),
+        ),
+      ],
     );
   }
 }

@@ -13,11 +13,19 @@ import '../../data/models/element_balance.dart';
 import '../../data/models/relationship_analysis.dart';
 import '../../data/repositories/repository_provider.dart';
 import '../../data/services/pdf_service.dart';
+import '../../data/services/auth_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../data/services/element_balance_calculator.dart';
 
 class RelationshipResultScreen extends StatefulWidget {
   final RelationshipAnalysis analysis;
-  const RelationshipResultScreen({super.key, required this.analysis});
+  final bool saveOnOpen;
+
+  const RelationshipResultScreen({
+    super.key,
+    required this.analysis,
+    this.saveOnOpen = true,
+  });
 
   @override
   State<RelationshipResultScreen> createState() =>
@@ -30,6 +38,7 @@ class _RelationshipResultScreenState extends State<RelationshipResultScreen> {
   @override
   void initState() {
     super.initState();
+    if (!widget.saveOnOpen) return;
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final repo = await getRepository();
       await repo.saveRelationshipAnalysis(widget.analysis);
@@ -40,9 +49,11 @@ class _RelationshipResultScreenState extends State<RelationshipResultScreen> {
     if (_sharing) return;
     setState(() => _sharing = true);
     try {
-      final file = await PdfService.generateRelationshipAnalysis(widget.analysis);
+      final file =
+          await PdfService.generateRelationshipAnalysis(widget.analysis);
       await PdfService.share(file,
-          subject: 'Pin Kodum — ${widget.analysis.firstName} & ${widget.analysis.secondName}');
+          subject:
+              'Pin Kodum — ${widget.analysis.firstName} & ${widget.analysis.secondName}');
     } finally {
       if (mounted) setState(() => _sharing = false);
     }
@@ -134,8 +145,16 @@ class _RelationshipResultScreenState extends State<RelationshipResultScreen> {
 
                       // ── Premium çekim kartı ───────────────────────────────
                       _RelPremiumHook(
-                          onTap: () => context.push(AppRoutes.relPremiumLoading,
-                              extra: a)),
+                          onTap: () async {
+                            final prefs = await SharedPreferences.getInstance();
+                            final user = AuthService(prefs).currentUser;
+                            if (!context.mounted) return;
+                            if (user?.isAdmin == true || user?.hasActivePremium == true) {
+                              context.push(AppRoutes.relPremiumLoading, extra: a);
+                            } else {
+                              context.push(AppRoutes.relPremiumPurchase, extra: a);
+                            }
+                          }),
                       const SizedBox(height: 20),
 
                       const SizedBox(height: 8),
@@ -161,7 +180,8 @@ class _RelAppBar extends StatelessWidget {
   final String title;
   final VoidCallback onShare;
   final bool sharing;
-  const _RelAppBar({required this.title, required this.onShare, required this.sharing});
+  const _RelAppBar(
+      {required this.title, required this.onShare, required this.sharing});
 
   @override
   Widget build(BuildContext context) {
@@ -180,11 +200,16 @@ class _RelAppBar extends StatelessWidget {
                 textAlign: TextAlign.center),
           ),
           sharing
-              ? const SizedBox(width: 20, height: 20,
-                  child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.gold))
+              ? const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                      strokeWidth: 2, color: AppColors.gold))
               : IconButton(
-                  icon: const Icon(Icons.picture_as_pdf_outlined, size: 20, color: AppColors.gold),
-                  onPressed: onShare, tooltip: 'PDF Rapor'),
+                  icon: const Icon(Icons.picture_as_pdf_outlined,
+                      size: 20, color: AppColors.gold),
+                  onPressed: onShare,
+                  tooltip: 'PDF Rapor'),
           const HomeButton(),
         ],
       ),
