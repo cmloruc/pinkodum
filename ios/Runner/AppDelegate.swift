@@ -1,6 +1,7 @@
 import Flutter
 import FirebaseMessaging
 import UIKit
+import UserNotifications
 
 @main
 @objc class AppDelegate: FlutterAppDelegate, FlutterImplicitEngineDelegate {
@@ -39,7 +40,7 @@ import UIKit
   }
 
   override func applicationDidBecomeActive(_ application: UIApplication) {
-    application.applicationIconBadgeNumber = 0
+    UNUserNotificationCenter.current().setBadgeCount(0, withCompletionHandler: nil)
     super.applicationDidBecomeActive(application)
   }
 }
