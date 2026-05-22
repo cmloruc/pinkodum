@@ -79,11 +79,11 @@ class _SingleAnalysisFormScreenState extends State<SingleAnalysisFormScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(gradient: AppColors.backgroundGradient),
+        decoration: BoxDecoration(gradient: AppColors.backgroundGradient),
         child: SafeArea(
           child: Column(
             children: [
-              _AppBar(title: AppStrings.homeSingleAnalysis),
+              const _AppBar(title: AppStrings.homeSingleAnalysis),
               Expanded(
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.all(24),
@@ -107,7 +107,7 @@ class _SingleAnalysisFormScreenState extends State<SingleAnalysisFormScreen> {
                                     width: 1.5,
                                   ),
                                 ),
-                                child: const Icon(
+                                child: Icon(
                                   Icons.person_search_outlined,
                                   size: 28,
                                   color: AppColors.gold,
@@ -135,7 +135,7 @@ class _SingleAnalysisFormScreenState extends State<SingleAnalysisFormScreen> {
                           controller: _nameController,
                           style: AppTextStyles.bodyLarge,
                           textCapitalization: TextCapitalization.words,
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
                             hintText: 'Adını gir',
                             prefixIcon: Icon(Icons.person_outline,
                                 color: AppColors.textMuted),
@@ -183,7 +183,7 @@ class _AppBar extends StatelessWidget {
       child: Row(
         children: [
           IconButton(
-            icon: const Icon(Icons.arrow_back_ios_new,
+            icon: Icon(Icons.arrow_back_ios_new,
                 size: 18, color: AppColors.textPrimary),
             onPressed: () => context.pop(),
           ),

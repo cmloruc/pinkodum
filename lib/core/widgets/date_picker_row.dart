@@ -17,9 +17,19 @@ class DatePickerRow extends StatefulWidget {
 }
 
 class _DatePickerRowState extends State<DatePickerRow> {
-  static const _months = [
-    'Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran',
-    'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık',
+  static final _months = [
+    'Ocak',
+    'Şubat',
+    'Mart',
+    'Nisan',
+    'Mayıs',
+    'Haziran',
+    'Temmuz',
+    'Ağustos',
+    'Eylül',
+    'Ekim',
+    'Kasım',
+    'Aralık',
   ];
 
   int? _day;
@@ -46,13 +56,11 @@ class _DatePickerRowState extends State<DatePickerRow> {
     }
   }
 
-  int _daysInMonth(int month, int year) =>
-      DateTime(year, month + 1, 0).day;
+  int _daysInMonth(int month, int year) => DateTime(year, month + 1, 0).day;
 
   List<int> get _dayList {
-    final max = (_month != null && _year != null)
-        ? _daysInMonth(_month!, _year!)
-        : 31;
+    final max =
+        (_month != null && _year != null) ? _daysInMonth(_month!, _year!) : 31;
     return List.generate(max, (i) => i + 1);
   }
 
@@ -149,7 +157,7 @@ class _Dropdown<T> extends StatelessWidget {
           dropdownColor: AppColors.surfaceLight,
           style: AppTextStyles.bodyLarge,
           hint: Text(hint, style: AppTextStyles.bodyMedium),
-          icon: const Icon(Icons.keyboard_arrow_down,
+          icon: Icon(Icons.keyboard_arrow_down,
               size: 18, color: AppColors.textMuted),
           menuMaxHeight: 260,
           items: items

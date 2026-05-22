@@ -132,7 +132,7 @@ class _HistoryScreenState extends State<HistoryScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(gradient: AppColors.backgroundGradient),
+        decoration: BoxDecoration(gradient: AppColors.backgroundGradient),
         child: SafeArea(
           child: Column(
             children: [
@@ -141,7 +141,7 @@ class _HistoryScreenState extends State<HistoryScreen>
                 child: Row(
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.arrow_back_ios_new,
+                      icon: Icon(Icons.arrow_back_ios_new,
                           size: 18, color: AppColors.textPrimary),
                       onPressed: () => context.pop(),
                     ),
@@ -171,7 +171,7 @@ class _HistoryScreenState extends State<HistoryScreen>
               ),
               Expanded(
                 child: _loading
-                    ? const Center(
+                    ? Center(
                         child: CircularProgressIndicator(color: AppColors.gold))
                     : TabBarView(
                         controller: _tabController,
@@ -249,7 +249,7 @@ class _PersonList extends StatelessWidget {
             padding: const EdgeInsets.all(16),
             child: Row(
               children: [
-                const _HistoryAvatar(
+                _HistoryAvatar(
                     icon: Icons.person_outline, color: AppColors.gold),
                 const SizedBox(width: 12),
                 Expanded(
@@ -267,8 +267,7 @@ class _PersonList extends StatelessWidget {
                     ],
                   ),
                 ),
-                const Icon(Icons.chevron_right,
-                    color: AppColors.textMuted, size: 18),
+                Icon(Icons.chevron_right, color: AppColors.textMuted, size: 18),
               ],
             ),
           ),
@@ -308,7 +307,7 @@ class _RelationshipList extends StatelessWidget {
             padding: const EdgeInsets.all(16),
             child: Row(
               children: [
-                const _HistoryAvatar(
+                _HistoryAvatar(
                     icon: Icons.favorite_outline, color: AppColors.purple),
                 const SizedBox(width: 12),
                 Expanded(
@@ -326,8 +325,7 @@ class _RelationshipList extends StatelessWidget {
                     ],
                   ),
                 ),
-                const Icon(Icons.chevron_right,
-                    color: AppColors.textMuted, size: 18),
+                Icon(Icons.chevron_right, color: AppColors.textMuted, size: 18),
               ],
             ),
           ),
@@ -368,8 +366,7 @@ class _PremiumList extends StatelessWidget {
             padding: const EdgeInsets.all(16),
             child: Row(
               children: [
-                const _HistoryAvatar(
-                    icon: Icons.auto_awesome, color: AppColors.gold),
+                _HistoryAvatar(icon: Icons.auto_awesome, color: AppColors.gold),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(
@@ -404,8 +401,7 @@ class _PremiumList extends StatelessWidget {
                     ],
                   ),
                 ),
-                const Icon(Icons.chevron_right,
-                    color: AppColors.textMuted, size: 18),
+                Icon(Icons.chevron_right, color: AppColors.textMuted, size: 18),
               ],
             ),
           ),
@@ -467,8 +463,7 @@ class _RelPremiumList extends StatelessWidget {
             padding: const EdgeInsets.all(16),
             child: Row(
               children: [
-                const _HistoryAvatar(
-                    icon: Icons.favorite, color: AppColors.purple),
+                _HistoryAvatar(icon: Icons.favorite, color: AppColors.purple),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(
@@ -501,8 +496,7 @@ class _RelPremiumList extends StatelessWidget {
                     ],
                   ),
                 ),
-                const Icon(Icons.chevron_right,
-                    color: AppColors.textMuted, size: 18),
+                Icon(Icons.chevron_right, color: AppColors.textMuted, size: 18),
               ],
             ),
           ),

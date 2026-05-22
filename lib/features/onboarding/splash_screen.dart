@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../app/router.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_text_styles.dart';
+import '../../core/widgets/numerology_seal.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -60,7 +61,7 @@ class _SplashScreenState extends State<SplashScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(gradient: AppColors.deepSpaceGradient),
+        decoration: BoxDecoration(gradient: AppColors.deepSpaceGradient),
         child: Center(
           child: FadeTransition(
             opacity: _fadeIn,
@@ -69,27 +70,7 @@ class _SplashScreenState extends State<SplashScreen>
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Logo dairesi
-                  Container(
-                    width: 96,
-                    height: 96,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: AppColors.goldGradient,
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.gold.withOpacity(0.35),
-                          blurRadius: 32,
-                          spreadRadius: 4,
-                        ),
-                      ],
-                    ),
-                    child: const Icon(
-                      Icons.auto_awesome,
-                      size: 44,
-                      color: AppColors.background,
-                    ),
-                  ),
+                  const NumerologySeal(size: 154),
                   const SizedBox(height: 24),
                   Text(
                     'Pin Kodum',

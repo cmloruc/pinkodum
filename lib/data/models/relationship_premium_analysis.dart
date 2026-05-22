@@ -12,15 +12,15 @@ class RelationshipPremiumAnalysis {
   final String relationshipType;
 
   // Ortak pin kodunun 9 hane yorumu
-  final String h1Combined;   // Kişilik
-  final String h2Combined;   // Sosyal Bilinç
-  final String h3Combined;   // Küresel Bilinçlilik
-  final String h4Combined;   // Yaşam Döngüsü
-  final String h5Combined;   // Ders / Potansiyel
-  final String h6Combined;   // İçsel Benlik
-  final String h7Combined;   // İçsel Çocuk
-  final String h8Combined;   // Ruh Duygusu
-  final String h9Combined;   // Evren
+  final String h1Combined; // Kişilik
+  final String h2Combined; // Sosyal Bilinç
+  final String h3Combined; // Küresel Bilinçlilik
+  final String h4Combined; // Yaşam Döngüsü
+  final String h5Combined; // Ders / Potansiyel
+  final String h6Combined; // İçsel Benlik
+  final String h7Combined; // İçsel Çocuk
+  final String h8Combined; // Ruh Duygusu
+  final String h9Combined; // Evren
 
   // Derinlemesine bölümler
   final String elementCompatibility;

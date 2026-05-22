@@ -89,7 +89,7 @@ class _PremiumPurchaseScreenState extends State<PremiumPurchaseScreen> {
                 child: Row(
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.arrow_back_ios_new,
+                      icon: Icon(Icons.arrow_back_ios_new,
                           size: 18, color: AppColors.textPrimary),
                       onPressed: () => context.pop(),
                     ),
@@ -155,7 +155,7 @@ class _PremiumPurchaseScreenState extends State<PremiumPurchaseScreen> {
 class _WhatYouGet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    const items = [
+    final items = [
       (
         Icons.person_outline,
         'Kişilik',
@@ -200,7 +200,7 @@ class _WhatYouGet extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(Icons.star, size: 15, color: AppColors.gold),
+              Icon(Icons.star, size: 15, color: AppColors.gold),
               const SizedBox(width: 8),
               Text('Detaylı Analizinde Neler Var?',
                   style: AppTextStyles.titleMedium
@@ -306,7 +306,7 @@ class _PriceCard extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             if (loading)
-              const CircularProgressIndicator(
+              CircularProgressIndicator(
                   color: AppColors.background, strokeWidth: 2)
             else if (error != null)
               Text(

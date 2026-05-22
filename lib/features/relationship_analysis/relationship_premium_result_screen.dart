@@ -57,7 +57,7 @@ class _RelationshipPremiumResultScreenState
                 child: Row(
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.arrow_back_ios_new,
+                      icon: Icon(Icons.arrow_back_ios_new,
                           size: 18, color: AppColors.textPrimary),
                       onPressed: () => context.pop(),
                     ),
@@ -67,13 +67,13 @@ class _RelationshipPremiumResultScreenState
                           textAlign: TextAlign.center),
                     ),
                     _sharing
-                        ? const SizedBox(
+                        ? SizedBox(
                             width: 20,
                             height: 20,
                             child: CircularProgressIndicator(
                                 strokeWidth: 2, color: AppColors.gold))
                         : IconButton(
-                            icon: const Icon(Icons.picture_as_pdf_outlined,
+                            icon: Icon(Icons.picture_as_pdf_outlined,
                                 size: 20, color: AppColors.gold),
                             onPressed: _sharePdf,
                             tooltip: 'PDF Rapor'),
@@ -120,7 +120,7 @@ class _RelationshipPremiumResultScreenState
                       const SizedBox(height: 20),
 
                       // Ortak pin ağacı
-                      _SectionTitle(
+                      const _SectionTitle(
                           'Ortak Pin Kodunuz', Icons.grid_view_outlined),
                       const SizedBox(height: 10),
                       Container(
@@ -144,7 +144,7 @@ class _RelationshipPremiumResultScreenState
                       const SizedBox(height: 20),
 
                       // 9 Hane Yorumu
-                      _SectionTitle(
+                      const _SectionTitle(
                           'Ortak Pin Kodu Yorumu', Icons.layers_outlined),
                       const SizedBox(height: 10),
                       _HaneCard(
@@ -198,7 +198,7 @@ class _RelationshipPremiumResultScreenState
                       const SizedBox(height: 20),
 
                       // Element tablosu
-                      _SectionTitle('Element Uyumunuz',
+                      const _SectionTitle('Element Uyumunuz',
                           Icons.auto_awesome_mosaic_outlined),
                       const SizedBox(height: 10),
                       _ElementTable(a: a),
@@ -210,7 +210,7 @@ class _RelationshipPremiumResultScreenState
                       const SizedBox(height: 16),
 
                       // İletişim
-                      _SectionTitle(
+                      const _SectionTitle(
                           'İletişim Tarzınız', Icons.chat_bubble_outline),
                       const SizedBox(height: 10),
                       _DetailCard(
@@ -220,7 +220,8 @@ class _RelationshipPremiumResultScreenState
                       const SizedBox(height: 12),
 
                       // Çatışma
-                      _SectionTitle('Çatışma Kalıpları', Icons.bolt_outlined),
+                      const _SectionTitle(
+                          'Çatışma Kalıpları', Icons.bolt_outlined),
                       const SizedBox(height: 10),
                       _DetailCard(
                           icon: Icons.bolt_outlined,
@@ -229,7 +230,8 @@ class _RelationshipPremiumResultScreenState
                       const SizedBox(height: 12),
 
                       // Büyüme
-                      _SectionTitle('Büyüme Fırsatları', Icons.trending_up),
+                      const _SectionTitle(
+                          'Büyüme Fırsatları', Icons.trending_up),
                       const SizedBox(height: 10),
                       _DetailCard(
                           icon: Icons.trending_up,
@@ -239,7 +241,7 @@ class _RelationshipPremiumResultScreenState
 
                       // Fiziksel uyum
                       if (showSexual) ...[
-                        _SectionTitle('Fiziksel Uyum',
+                        const _SectionTitle('Fiziksel Uyum',
                             Icons.local_fire_department_outlined),
                         const SizedBox(height: 10),
                         _DetailCard(
@@ -260,7 +262,8 @@ class _RelationshipPremiumResultScreenState
                       const SizedBox(height: 12),
 
                       // Ders
-                      _SectionTitle('İlişkinizin Dersi', Icons.school_outlined),
+                      const _SectionTitle(
+                          'İlişkinizin Dersi', Icons.school_outlined),
                       const SizedBox(height: 10),
                       _DetailCard(
                           icon: Icons.school_outlined,
@@ -270,7 +273,7 @@ class _RelationshipPremiumResultScreenState
 
                       Center(
                         child: TextButton.icon(
-                          icon: const Icon(Icons.refresh,
+                          icon: Icon(Icons.refresh,
                               size: 16, color: AppColors.textMuted),
                           label: Text('Yeni Analiz',
                               style: AppTextStyles.bodyMedium),
@@ -294,14 +297,14 @@ class _ElementTable extends StatelessWidget {
   final RelationshipPremiumAnalysis a;
   const _ElementTable({required this.a});
 
-  static const _colors = {
-    'Hava': Color(0xFF60A5FA),
-    'Su': Color(0xFF38BDF8),
-    'Ateş': Color(0xFFF97316),
-    'Toprak': Color(0xFF84CC16),
-    'Denge': Color(0xFFD4AF37),
+  static final _colors = {
+    'Hava': const Color(0xFF60A5FA),
+    'Su': const Color(0xFF38BDF8),
+    'Ateş': const Color(0xFFF97316),
+    'Toprak': const Color(0xFF84CC16),
+    'Denge': const Color(0xFFD4AF37),
   };
-  static const _icons = {
+  static final _icons = {
     'Hava': Icons.air,
     'Su': Icons.water_drop_outlined,
     'Ateş': Icons.local_fire_department_outlined,
@@ -311,7 +314,7 @@ class _ElementTable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final calc = const ElementBalanceCalculator();
+    const calc = ElementBalanceCalculator();
     final e1 = calc.calculate(a.firstPinCode);
     final e2 = calc.calculate(a.secondPinCode);
     final ec = calc.calculate(a.combinedPinCode);
@@ -363,10 +366,10 @@ class _ElementTable extends StatelessWidget {
                   color: c(e2.dominantElement),
                   icon: ico(e2.dominantElement))),
         ]),
-        const Divider(color: AppColors.border, height: 20),
+        Divider(color: AppColors.border, height: 20),
         // Ortak pin haneden element tablosu
         Row(children: [
-          const Icon(Icons.auto_awesome, size: 13, color: AppColors.gold),
+          Icon(Icons.auto_awesome, size: 13, color: AppColors.gold),
           const SizedBox(width: 6),
           Text('Ortak Pin Kodunun Element Dağılımı',
               style: AppTextStyles.labelMedium.copyWith(color: AppColors.gold)),
@@ -374,9 +377,9 @@ class _ElementTable extends StatelessWidget {
         const SizedBox(height: 10),
         Table(
           columnWidths: const {
-            0: FlexColumnWidth(1.2),
-            1: FlexColumnWidth(0.6),
-            2: FlexColumnWidth(1.4),
+            0: const FlexColumnWidth(1.2),
+            1: const FlexColumnWidth(0.6),
+            2: const FlexColumnWidth(1.4),
           },
           children: [
             TableRow(children: [
@@ -428,7 +431,7 @@ class _ElementTable extends StatelessWidget {
             }),
           ],
         ),
-        const Divider(color: AppColors.border, height: 20),
+        Divider(color: AppColors.border, height: 20),
         // Ortak element barları
         ...[
           ('Hava', ec.air),
@@ -466,7 +469,7 @@ class _ElementTable extends StatelessWidget {
             ]),
           );
         }),
-        const Divider(color: AppColors.border, height: 16),
+        Divider(color: AppColors.border, height: 16),
         Row(children: [
           Expanded(
               child: _ScoreChip(
@@ -609,8 +612,7 @@ class _SummaryCard extends StatelessWidget {
         padding: const EdgeInsets.all(22),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(children: [
-            const Icon(Icons.auto_awesome,
-                size: 16, color: AppColors.purpleLight),
+            Icon(Icons.auto_awesome, size: 16, color: AppColors.purpleLight),
             const SizedBox(width: 8),
             Text('Genel Özet',
                 style: AppTextStyles.labelMedium

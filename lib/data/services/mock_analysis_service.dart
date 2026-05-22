@@ -97,12 +97,16 @@ class MockAnalysisService implements AnalysisService {
       firstElementBalance: elem1,
       secondElementBalance: elem2,
       combinedElementBalance: elemCombined,
-      sexualCompatibility: MockAnalysisData.showSexualCompatibility(relationshipType)
-          ? MockAnalysisData.sexualCompatibilityTeaser(
-              firstName, secondName,
-              elemCombined.fire, elemCombined.water,
-              elemCombined.air, elemCombined.energyType)
-          : null,
+      sexualCompatibility:
+          MockAnalysisData.showSexualCompatibility(relationshipType)
+              ? MockAnalysisData.sexualCompatibilityTeaser(
+                  firstName,
+                  secondName,
+                  elemCombined.fire,
+                  elemCombined.water,
+                  elemCombined.air,
+                  elemCombined.energyType)
+              : null,
       createdAt: DateTime.now(),
     );
   }

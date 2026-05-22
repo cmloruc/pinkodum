@@ -88,7 +88,7 @@ class _RelationshipFormScreenState extends State<RelationshipFormScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(gradient: AppColors.backgroundGradient),
+        decoration: BoxDecoration(gradient: AppColors.backgroundGradient),
         child: SafeArea(
           child: Column(
             children: [
@@ -114,7 +114,7 @@ class _RelationshipFormScreenState extends State<RelationshipFormScreen> {
                                       color: AppColors.purple.withOpacity(0.4),
                                       width: 1.5),
                                 ),
-                                child: const Icon(Icons.favorite_outline,
+                                child: Icon(Icons.favorite_outline,
                                     size: 28, color: AppColors.purple),
                               ),
                               const SizedBox(height: 16),
@@ -130,7 +130,7 @@ class _RelationshipFormScreenState extends State<RelationshipFormScreen> {
                           ),
                         ),
                         const SizedBox(height: 32),
-                        _SectionLabel('1. Kişi'),
+                        const _SectionLabel('1. Kişi'),
                         const SizedBox(height: 12),
                         _NameField(controller: _name1, hint: '1. kişinin adı'),
                         const SizedBox(height: 12),
@@ -139,7 +139,7 @@ class _RelationshipFormScreenState extends State<RelationshipFormScreen> {
                           onChanged: (d) => setState(() => _date1 = d),
                         ),
                         const SizedBox(height: 24),
-                        _SectionLabel('2. Kişi'),
+                        const _SectionLabel('2. Kişi'),
                         const SizedBox(height: 12),
                         _NameField(controller: _name2, hint: '2. kişinin adı'),
                         const SizedBox(height: 12),
@@ -213,8 +213,7 @@ class _NameField extends StatelessWidget {
       textCapitalization: TextCapitalization.words,
       decoration: InputDecoration(
         hintText: hint,
-        prefixIcon:
-            const Icon(Icons.person_outline, color: AppColors.textMuted),
+        prefixIcon: Icon(Icons.person_outline, color: AppColors.textMuted),
       ),
       validator: (v) => (v == null || v.trim().isEmpty)
           ? AppStrings.validationNameRequired
@@ -234,7 +233,7 @@ class _RelationshipDropdown extends StatelessWidget {
       value: value,
       dropdownColor: AppColors.surfaceLight,
       style: AppTextStyles.bodyLarge,
-      decoration: const InputDecoration(
+      decoration: InputDecoration(
         prefixIcon: Icon(Icons.link_outlined, color: AppColors.textMuted),
       ),
       hint: Text('İlişki türü seç', style: AppTextStyles.bodyMedium),
@@ -256,7 +255,7 @@ class _RelAppBar extends StatelessWidget {
       child: Row(
         children: [
           IconButton(
-            icon: const Icon(Icons.arrow_back_ios_new,
+            icon: Icon(Icons.arrow_back_ios_new,
                 size: 18, color: AppColors.textPrimary),
             onPressed: () => context.pop(),
           ),

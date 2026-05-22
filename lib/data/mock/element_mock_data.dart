@@ -15,49 +15,46 @@ class ElementMockData {
   }
 
   static const Map<String, String> _dominantElementText = {
-    ElementBalanceCalculator.elementAir:
-        'pin kodunda Hava elementi öne çıkıyor. '
+    ElementBalanceCalculator.elementAir: 'pin kodunda Hava elementi öne çıkıyor. '
         'Bu, zihinsel hareketliliğinin, gözlem gücünün ve iletişim ihtiyacının güçlü olduğunu gösteriyor. '
         'Fikirleri hızla işliyor, bağlantılar kuruyorsun ve çevrendeki değişimleri erkenden seziyorsun.',
-    ElementBalanceCalculator.elementWater:
-        'pin kodunda Su elementi öne çıkıyor. '
+    ElementBalanceCalculator.elementWater: 'pin kodunda Su elementi öne çıkıyor. '
         'Bu, duygusal derinliğinin, sezgisel gücünün ve empati kapasitesinin belirleyici olduğunu gösteriyor. '
         'Hissederek anlıyorsun; insanların söylemediklerini bile fark edebiliyorsun.',
-    ElementBalanceCalculator.elementFire:
-        'pin kodunda Ateş elementi öne çıkıyor. '
+    ElementBalanceCalculator.elementFire: 'pin kodunda Ateş elementi öne çıkıyor. '
         'Bu, içindeki tutkuyu, harekete geçme enerjisini ve ilham verme gücünü yansıtıyor. '
         'Bir şeye inandığında tüm enerjinle arkasında duruyorsun.',
     ElementBalanceCalculator.elementEarth:
         'pin kodunda Toprak elementi öne çıkıyor. '
-        'Bu, pratik zekanını, sabır ve kararlılığını, sağlam temeller kurma içgüdünü gösteriyor. '
-        'Güvenilir, tutarlı ve gerçekçi bir enerji taşıyorsun.',
+            'Bu, pratik zekanını, sabır ve kararlılığını, sağlam temeller kurma içgüdünü gösteriyor. '
+            'Güvenilir, tutarlı ve gerçekçi bir enerji taşıyorsun.',
   };
 
   static const Map<String, String> _energyTypeText = {
     ElementBalanceCalculator.energyDominant:
         'Baskın enerjin yüksek olduğu için hayatta beklemekten çok harekete geçmeye, '
-        'karar almaya ve yön vermeye yatkınsın.',
+            'karar almaya ve yön vermeye yatkınsın.',
     ElementBalanceCalculator.energyPassive:
         'Edilgen enerjin belirgin olduğu için dinlemeye, gözlemlemeye ve '
-        'uyum sağlamaya doğal bir yatkınlığın var.',
+            'uyum sağlamaya doğal bir yatkınlığın var.',
     ElementBalanceCalculator.energyBalanced:
         'Baskın ve edilgen enerjin dengeli dağılmış; '
-        'hem harekete geçebiliyor hem de durumu okuyabiliyorsun.',
+            'hem harekete geçebiliyor hem de durumu okuyabiliyorsun.',
   };
 
   static const Map<String, String> _weakElementText = {
     ElementBalanceCalculator.elementAir:
         'Hava elementi daha düşük olduğu için zaman zaman düşüncelerini '
-        'netleştirmek ya da iletişimi akıcı tutmak biraz daha çaba gerektirebilir.',
+            'netleştirmek ya da iletişimi akıcı tutmak biraz daha çaba gerektirebilir.',
     ElementBalanceCalculator.elementWater:
         'Su elementi daha düşük olduğu için bazen duygularını açıkça göstermek yerine '
-        'önce mantıkla çözmeye çalışabilirsin. Duygusal ifadeye biraz daha alan açmak seni dengeleyebilir.',
+            'önce mantıkla çözmeye çalışabilirsin. Duygusal ifadeye biraz daha alan açmak seni dengeleyebilir.',
     ElementBalanceCalculator.elementFire:
         'Ateş elementi daha düşük olduğu için tutku ve motivasyonu sürdürmek '
-        'zaman zaman zorlanabilir. Seni gerçekten ateşleyen şeylere daha fazla yer açmak işe yarıyor.',
+            'zaman zaman zorlanabilir. Seni gerçekten ateşleyen şeylere daha fazla yer açmak işe yarıyor.',
     ElementBalanceCalculator.elementEarth:
         'Toprak elementi daha düşük olduğu için bazen temelleri sağlamlaştırmak, '
-        'sabırla ilerlemek ve somut adımlar atmak biraz daha çaba gerektirebilir.',
+            'sabırla ilerlemek ve somut adımlar atmak biraz daha çaba gerektirebilir.',
   };
 
   // ─── İlişki element uyumu yorumu ────────────────────────────────────────────
@@ -72,7 +69,8 @@ class ElementMockData {
 
     final elementNote = sameElement
         ? _sameElementNote(name1, name2, e1.dominantElement)
-        : _differentElementNote(name1, name2, e1.dominantElement, e2.dominantElement);
+        : _differentElementNote(
+            name1, name2, e1.dominantElement, e2.dominantElement);
 
     final energyNote = _energyComboNote(energyCombo, name1, name2);
 
@@ -137,8 +135,7 @@ class ElementMockData {
     maxShared['Su'] = e1.water + e2.water;
     maxShared['Ateş'] = e1.fire + e2.fire;
     maxShared['Toprak'] = e1.earth + e2.earth;
-    final best =
-        maxShared.entries.reduce((a, b) => a.value > b.value ? a : b);
+    final best = maxShared.entries.reduce((a, b) => a.value > b.value ? a : b);
     return '${best.key} (toplam ${best.value})';
   }
 
@@ -157,8 +154,7 @@ class ElementMockData {
       'Ateş': (e1.fire - e2.fire).abs(),
       'Toprak': (e1.earth - e2.earth).abs(),
     };
-    final maxDiff =
-        diffs.entries.reduce((a, b) => a.value > b.value ? a : b);
+    final maxDiff = diffs.entries.reduce((a, b) => a.value > b.value ? a : b);
     if (maxDiff.value == 0) return 'Belirgin bir element farkı yok';
     return '${maxDiff.key} — bu alanda farklı yaklaşımlar olabilir';
   }

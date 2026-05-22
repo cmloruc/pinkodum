@@ -6,12 +6,15 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_strings.dart';
 import '../../core/constants/app_text_styles.dart';
+import '../../core/services/theme_service.dart';
+import '../../core/theme/app_theme_data.dart';
 import '../../app/router.dart';
 import '../../core/widgets/custom_button.dart';
 import '../../core/widgets/gradient_card.dart';
 import '../../data/services/api_key_service.dart';
 import '../../data/services/auth_service.dart';
 import '../../data/services/feedback_service.dart';
+import '../../data/services/notification_service.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -31,6 +34,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
   String? _saveStatus;
   AuthUser? _authUser;
   bool _loggingOut = false;
+  NotificationService? _notificationService;
+  List<AppNotification> _unreadNotifications = const [];
+  bool _notificationsLoading = false;
 
   @override
   void initState() {
@@ -55,10 +61,47 @@ class _SettingsScreenState extends State<SettingsScreen> {
           _selectedModel = svc.model;
           _apiKeyLoaded = true;
           _authUser = authUser;
+          _notificationService =
+              auth.token == null ? null : NotificationService(auth.token!);
         });
       }
+      await _loadUnreadNotifications();
     } catch (_) {
       if (mounted) setState(() => _apiKeyLoaded = true);
+    }
+  }
+
+  Future<void> _loadUnreadNotifications() async {
+    final service = _notificationService;
+    if (service == null) return;
+    if (mounted) setState(() => _notificationsLoading = true);
+    try {
+      final unread = await service.getUnread();
+      if (mounted) setState(() => _unreadNotifications = unread);
+    } catch (_) {
+      // Ayarlar bildirim sunucusu gecici olarak ulasilamaz olsa da acilsin.
+    } finally {
+      if (mounted) setState(() => _notificationsLoading = false);
+    }
+  }
+
+  Future<void> _readNotification(AppNotification notification) async {
+    await _showNotificationSheet(context, notification);
+    final service = _notificationService;
+    if (service == null) return;
+    try {
+      await service.markRead(notification.id);
+      if (!mounted) return;
+      setState(() {
+        _unreadNotifications = _unreadNotifications
+            .where((item) => item.id != notification.id)
+            .toList();
+      });
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString().replaceFirst('Exception: ', ''))),
+      );
     }
   }
 
@@ -117,7 +160,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(gradient: AppColors.backgroundGradient),
+        decoration: BoxDecoration(gradient: AppColors.backgroundGradient),
         child: SafeArea(
           child: Column(
             children: [
@@ -126,7 +169,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 child: Row(
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.arrow_back_ios_new,
+                      icon: Icon(Icons.arrow_back_ios_new,
                           size: 18, color: AppColors.textPrimary),
                       onPressed: () => context.pop(),
                     ),
@@ -146,7 +189,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // ── Hesap Bölümü ──────────────────────────────────
-                      _SectionHeader('Hesap'),
+                      const _SectionHeader('Hesap'),
                       const SizedBox(height: 12),
                       _authUser != null
                           ? GradientCard(
@@ -165,7 +208,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                           shape: BoxShape.circle,
                                           gradient: AppColors.goldGradient,
                                         ),
-                                        child: const Icon(Icons.person,
+                                        child: Icon(Icons.person,
                                             size: 20,
                                             color: AppColors.background),
                                       ),
@@ -191,105 +234,122 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     ],
                                   ),
                                   if (_authUser!.hasActivePremium) ...[
-                                  const SizedBox(height: 14),
-                                  Container(
-                                    width: double.infinity,
-                                    padding: const EdgeInsets.all(14),
-                                    decoration: BoxDecoration(
-                                      color: AppColors.gold.withValues(alpha: 0.08),
-                                      borderRadius: BorderRadius.circular(12),
-                                      border: Border.all(color: AppColors.gold.withValues(alpha: 0.22)),
-                                    ),
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Row(
-                                          children: [
-                                            const Icon(Icons.star_outline, size: 18, color: AppColors.gold),
-                                            const SizedBox(width: 8),
-                                            Text('Premium Üyelik',
-                                                style: AppTextStyles.labelMedium.copyWith(color: AppColors.gold)),
-                                          ],
-                                        ),
-                                        if (_authUser!.premiumUntil != null) ...[
-                                          const SizedBox(height: 6),
-                                          Text(
-                                            'Bitiş tarihi: ${_formatDate(_authUser!.premiumUntil!)}',
-                                            style: AppTextStyles.bodySmall.copyWith(color: AppColors.textMuted),
-                                          ),
-                                        ],
-                                        const SizedBox(height: 10),
-                                        Row(
-                                          children: [
-                                            Expanded(
-                                              child: _QuotaItem(
-                                                label: 'Tekil Analiz',
-                                                remaining: _authUser!.monthlySingleRemaining,
-                                                total: 10,
-                                              ),
-                                            ),
-                                            const SizedBox(width: 12),
-                                            Expanded(
-                                              child: _QuotaItem(
-                                                label: 'İlişki Analizi',
-                                                remaining: _authUser!.monthlyRelationshipRemaining,
-                                                total: 10,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  ] else if (!(_authUser!.isAdmin)) ...[
-                                  const SizedBox(height: 14),
-                                  Container(
-                                    width: double.infinity,
-                                    padding: const EdgeInsets.all(14),
-                                    decoration: BoxDecoration(
-                                      color: AppColors.gold
-                                          .withValues(alpha: 0.08),
-                                      borderRadius: BorderRadius.circular(12),
-                                      border: Border.all(
+                                    const SizedBox(height: 14),
+                                    Container(
+                                      width: double.infinity,
+                                      padding: const EdgeInsets.all(14),
+                                      decoration: BoxDecoration(
                                         color: AppColors.gold
-                                            .withValues(alpha: 0.22),
+                                            .withValues(alpha: 0.08),
+                                        borderRadius: BorderRadius.circular(12),
+                                        border: Border.all(
+                                            color: AppColors.gold
+                                                .withValues(alpha: 0.22)),
                                       ),
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        const Icon(Icons.toll_outlined,
-                                            size: 20, color: AppColors.gold),
-                                        const SizedBox(width: 10),
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
                                             children: [
-                                              Text('Kredi Bakiyesi',
+                                              Icon(Icons.star_outline,
+                                                  size: 18,
+                                                  color: AppColors.gold),
+                                              const SizedBox(width: 8),
+                                              Text('Premium Üyelik',
                                                   style: AppTextStyles
                                                       .labelMedium
                                                       .copyWith(
                                                           color:
                                                               AppColors.gold)),
-                                              const SizedBox(height: 2),
-                                              Text(
-                                                'Detaylı analizlerde kullanılır.',
-                                                style: AppTextStyles.bodySmall,
+                                            ],
+                                          ),
+                                          if (_authUser!.premiumUntil !=
+                                              null) ...[
+                                            const SizedBox(height: 6),
+                                            Text(
+                                              'Bitiş tarihi: ${_formatDate(_authUser!.premiumUntil!)}',
+                                              style: AppTextStyles.bodySmall
+                                                  .copyWith(
+                                                      color:
+                                                          AppColors.textMuted),
+                                            ),
+                                          ],
+                                          const SizedBox(height: 10),
+                                          Row(
+                                            children: [
+                                              Expanded(
+                                                child: _QuotaItem(
+                                                  label: 'Tekil Analiz',
+                                                  remaining: _authUser!
+                                                      .monthlySingleRemaining,
+                                                  total: 10,
+                                                ),
+                                              ),
+                                              const SizedBox(width: 12),
+                                              Expanded(
+                                                child: _QuotaItem(
+                                                  label: 'İlişki Analizi',
+                                                  remaining: _authUser!
+                                                      .monthlyRelationshipRemaining,
+                                                  total: 10,
+                                                ),
                                               ),
                                             ],
                                           ),
-                                        ),
-                                        Text(
-                                          '${_authUser!.credits} kredi',
-                                          style: AppTextStyles.titleMedium
-                                              .copyWith(
-                                            color: AppColors.textGold,
-                                            fontWeight: FontWeight.w700,
-                                          ),
-                                        ),
-                                      ],
+                                        ],
+                                      ),
                                     ),
-                                  ),
+                                  ] else if (!(_authUser!.isAdmin)) ...[
+                                    const SizedBox(height: 14),
+                                    Container(
+                                      width: double.infinity,
+                                      padding: const EdgeInsets.all(14),
+                                      decoration: BoxDecoration(
+                                        color: AppColors.gold
+                                            .withValues(alpha: 0.08),
+                                        borderRadius: BorderRadius.circular(12),
+                                        border: Border.all(
+                                          color: AppColors.gold
+                                              .withValues(alpha: 0.22),
+                                        ),
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          Icon(Icons.toll_outlined,
+                                              size: 20, color: AppColors.gold),
+                                          const SizedBox(width: 10),
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text('Kredi Bakiyesi',
+                                                    style: AppTextStyles
+                                                        .labelMedium
+                                                        .copyWith(
+                                                            color: AppColors
+                                                                .gold)),
+                                                const SizedBox(height: 2),
+                                                Text(
+                                                  'Detaylı analizlerde kullanılır.',
+                                                  style:
+                                                      AppTextStyles.bodySmall,
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          Text(
+                                            '${_authUser!.credits} kredi',
+                                            style: AppTextStyles.titleMedium
+                                                .copyWith(
+                                              color: AppColors.textGold,
+                                              fontWeight: FontWeight.w700,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
                                   ],
                                   const SizedBox(height: 14),
                                   GhostButton(
@@ -347,7 +407,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         ),
                         const SizedBox(height: 24),
                       ],
-                      _SectionHeader('Tercihler'),
+                      const _SectionHeader('Tercihler'),
                       const SizedBox(height: 12),
                       GradientCard(
                         padding: EdgeInsets.zero,
@@ -363,7 +423,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             ),
                             Divider(
                                 height: 1, color: AppColors.border, indent: 56),
-                            _InfoTile(
+                            const _InfoTile(
                               icon: Icons.language_outlined,
                               title: AppStrings.settingsLanguage,
                               trailing: AppStrings.settingsLanguageValue,
@@ -371,10 +431,29 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           ],
                         ),
                       ),
+                      const SizedBox(height: 12),
+                      GradientCard(
+                        padding: const EdgeInsets.all(16),
+                        child: _ThemePicker(),
+                      ),
                       const SizedBox(height: 24),
+                      if (_authUser != null && !_authUser!.isAdmin) ...[
+                        const _SectionHeader('Bildirim Kutusu'),
+                        const SizedBox(height: 12),
+                        GradientCard(
+                          padding: EdgeInsets.zero,
+                          child: _NotificationInbox(
+                            notifications: _unreadNotifications,
+                            loading: _notificationsLoading,
+                            onOpen: _readNotification,
+                            onRefresh: _loadUnreadNotifications,
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                      ],
                       // ── Geri Bildirim ─────────────────────────────────
                       if (_authUser != null) ...[
-                        _SectionHeader('Geri Bildirim'),
+                        const _SectionHeader('Geri Bildirim'),
                         const SizedBox(height: 12),
                         GradientCard(
                           padding: EdgeInsets.zero,
@@ -386,7 +465,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         ),
                         const SizedBox(height: 24),
                       ],
-                      _SectionHeader('Yasal'),
+                      const _SectionHeader('Yasal'),
                       const SizedBox(height: 12),
                       GradientCard(
                         padding: EdgeInsets.zero,
@@ -420,9 +499,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         ),
                       ),
                       const SizedBox(height: 24),
-                      _SectionHeader('Hakkında'),
+                      const _SectionHeader('Hakkında'),
                       const SizedBox(height: 12),
-                      GradientCard(
+                      const GradientCard(
                         padding: EdgeInsets.zero,
                         child: Column(
                           children: [
@@ -446,7 +525,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 shape: BoxShape.circle,
                                 gradient: AppColors.goldGradient,
                               ),
-                              child: const Icon(Icons.auto_awesome,
+                              child: Icon(Icons.auto_awesome,
                                   size: 24, color: AppColors.background),
                             ),
                             const SizedBox(height: 8),
@@ -506,7 +585,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
               children: [
                 Center(
                   child: Container(
-                    width: 40, height: 4,
+                    width: 40,
+                    height: 4,
                     decoration: BoxDecoration(
                       color: AppColors.border,
                       borderRadius: BorderRadius.circular(2),
@@ -514,9 +594,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                Text('Geri Bildirim Gönder', style: AppTextStyles.headlineLarge),
+                Text('Geri Bildirim Gönder',
+                    style: AppTextStyles.headlineLarge),
                 const SizedBox(height: 6),
-                Text('Dilek, şikayet veya talebini iletebilirsin.', style: AppTextStyles.bodySmall),
+                Text('Dilek, şikayet veya talebini iletebilirsin.',
+                    style: AppTextStyles.bodySmall),
                 const SizedBox(height: 20),
                 Text('Kategori', style: AppTextStyles.labelMedium),
                 const SizedBox(height: 8),
@@ -527,9 +609,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     return GestureDetector(
                       onTap: () => setModalState(() => selectedType = e.key),
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 14, vertical: 8),
                         decoration: BoxDecoration(
-                          color: selected ? AppColors.gold.withValues(alpha: 0.15) : AppColors.surfaceLight,
+                          color: selected
+                              ? AppColors.gold.withValues(alpha: 0.15)
+                              : AppColors.surfaceLight,
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(
                             color: selected ? AppColors.gold : AppColors.border,
@@ -538,8 +623,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         child: Text(
                           e.value,
                           style: AppTextStyles.bodySmall.copyWith(
-                            color: selected ? AppColors.textGold : AppColors.textPrimary,
-                            fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
+                            color: selected
+                                ? AppColors.textGold
+                                : AppColors.textPrimary,
+                            fontWeight:
+                                selected ? FontWeight.w600 : FontWeight.normal,
                           ),
                         ),
                       ),
@@ -565,33 +653,38 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     label: sending ? 'Gönderiliyor...' : 'Gönder',
                     icon: Icons.send_outlined,
                     loading: sending,
-                    onPressed: sending ? null : () async {
-                      final msg = messageController.text.trim();
-                      if (msg.isEmpty) return;
-                      setModalState(() => sending = true);
-                      try {
-                        await FeedbackService.send(type: selectedType, message: msg);
-                        if (ctx.mounted) {
-                          Navigator.pop(ctx);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Geri bildiriminiz alındı, teşekkürler!'),
-                              backgroundColor: AppColors.surface,
-                            ),
-                          );
-                        }
-                      } catch (_) {
-                        setModalState(() => sending = false);
-                        if (ctx.mounted) {
-                          ScaffoldMessenger.of(ctx).showSnackBar(
-                            const SnackBar(
-                              content: Text('Gönderilemedi, tekrar dene.'),
-                              backgroundColor: AppColors.surface,
-                            ),
-                          );
-                        }
-                      }
-                    },
+                    onPressed: sending
+                        ? null
+                        : () async {
+                            final msg = messageController.text.trim();
+                            if (msg.isEmpty) return;
+                            setModalState(() => sending = true);
+                            try {
+                              await FeedbackService.send(
+                                  type: selectedType, message: msg);
+                              if (ctx.mounted) {
+                                Navigator.pop(ctx);
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: const Text(
+                                        'Geri bildiriminiz alındı, teşekkürler!'),
+                                    backgroundColor: AppColors.surface,
+                                  ),
+                                );
+                              }
+                            } catch (_) {
+                              setModalState(() => sending = false);
+                              if (ctx.mounted) {
+                                ScaffoldMessenger.of(ctx).showSnackBar(
+                                  SnackBar(
+                                    content: const Text(
+                                        'Gönderilemedi, tekrar dene.'),
+                                    backgroundColor: AppColors.surface,
+                                  ),
+                                );
+                              }
+                            }
+                          },
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -642,6 +735,51 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
     );
   }
+
+  Future<void> _showNotificationSheet(
+    BuildContext context,
+    AppNotification notification,
+  ) {
+    return showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: AppColors.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => Padding(
+        padding: const EdgeInsets.all(24),
+        child: SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: AppColors.border,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Text(notification.title, style: AppTextStyles.headlineLarge),
+              const SizedBox(height: 12),
+              Text(notification.message, style: AppTextStyles.bodyLarge),
+              const SizedBox(height: 18),
+              Text(
+                'Okundu',
+                style: AppTextStyles.labelMedium.copyWith(
+                  color: AppColors.textGold,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class _QuotaItem extends StatelessWidget {
@@ -649,7 +787,8 @@ class _QuotaItem extends StatelessWidget {
   final int remaining;
   final int total;
 
-  const _QuotaItem({required this.label, required this.remaining, required this.total});
+  const _QuotaItem(
+      {required this.label, required this.remaining, required this.total});
 
   @override
   Widget build(BuildContext context) {
@@ -661,9 +800,11 @@ class _QuotaItem extends StatelessWidget {
         Row(
           children: [
             Text('$remaining',
-                style: AppTextStyles.titleMedium.copyWith(color: AppColors.gold, fontWeight: FontWeight.w700)),
+                style: AppTextStyles.titleMedium.copyWith(
+                    color: AppColors.gold, fontWeight: FontWeight.w700)),
             Text('/$total kaldı',
-                style: AppTextStyles.bodySmall.copyWith(color: AppColors.textMuted)),
+                style: AppTextStyles.bodySmall
+                    .copyWith(color: AppColors.textMuted)),
           ],
         ),
         const SizedBox(height: 4),
@@ -672,7 +813,7 @@ class _QuotaItem extends StatelessWidget {
           child: LinearProgressIndicator(
             value: total > 0 ? remaining / total : 0,
             backgroundColor: AppColors.surfaceLight,
-            valueColor: const AlwaysStoppedAnimation<Color>(AppColors.gold),
+            valueColor: AlwaysStoppedAnimation<Color>(AppColors.gold),
             minHeight: 4,
           ),
         ),
@@ -689,6 +830,239 @@ class _SectionHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(text,
         style: AppTextStyles.labelMedium.copyWith(color: AppColors.textGold));
+  }
+}
+
+class _ThemePicker extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return ValueListenableBuilder<AppThemeData>(
+      valueListenable: ThemeService.instance.notifier,
+      builder: (context, selectedTheme, _) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.palette_outlined,
+                    size: 20, color: AppColors.textGold),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text('Tema', style: AppTextStyles.titleMedium),
+                ),
+                Text(selectedTheme.name, style: AppTextStyles.bodySmall),
+              ],
+            ),
+            const SizedBox(height: 14),
+            Row(
+              children: allThemes.map((theme) {
+                final selected = theme.id == selectedTheme.id;
+                return Expanded(
+                  child: Padding(
+                    padding: EdgeInsets.only(
+                      right: theme == allThemes.first ? 6 : 0,
+                      left: theme == allThemes.last ? 6 : 0,
+                    ),
+                    child: _ThemePreview(
+                      theme: theme,
+                      selected: selected,
+                      onTap: () => ThemeService.instance.setTheme(theme),
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _NotificationInbox extends StatelessWidget {
+  final List<AppNotification> notifications;
+  final bool loading;
+  final ValueChanged<AppNotification> onOpen;
+  final VoidCallback onRefresh;
+
+  const _NotificationInbox({
+    required this.notifications,
+    required this.loading,
+    required this.onOpen,
+    required this.onRefresh,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (loading && notifications.isEmpty) {
+      return Padding(
+        padding: const EdgeInsets.all(20),
+        child: Center(
+          child: CircularProgressIndicator(color: AppColors.gold),
+        ),
+      );
+    }
+
+    if (notifications.isEmpty) {
+      return _InfoTile(
+        icon: Icons.notifications_none_outlined,
+        title: 'Okunmamış bildirim yok',
+        trailing: 'Yenile',
+        onTap: onRefresh,
+      );
+    }
+
+    return Column(
+      children: [
+        for (var index = 0; index < notifications.length; index++) ...[
+          _NotificationTile(
+            notification: notifications[index],
+            onTap: () => onOpen(notifications[index]),
+          ),
+          if (index != notifications.length - 1)
+            Divider(height: 1, color: AppColors.border, indent: 56),
+        ],
+      ],
+    );
+  }
+}
+
+class _NotificationTile extends StatelessWidget {
+  final AppNotification notification;
+  final VoidCallback onTap;
+
+  const _NotificationTile({required this.notification, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final icon = notification.type == 'announcement'
+        ? Icons.campaign_outlined
+        : Icons.auto_awesome_outlined;
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        child: Row(
+          children: [
+            Icon(icon, size: 20, color: AppColors.gold),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(notification.title, style: AppTextStyles.titleMedium),
+                  const SizedBox(height: 2),
+                  Text(
+                    notification.message,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppTextStyles.bodySmall,
+                  ),
+                ],
+              ),
+            ),
+            Icon(Icons.chevron_right, color: AppColors.textMuted, size: 18),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ThemePreview extends StatelessWidget {
+  final AppThemeData theme;
+  final bool selected;
+  final VoidCallback onTap;
+
+  const _ThemePreview({
+    required this.theme,
+    required this.selected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(14),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          height: 114,
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            gradient: theme.backgroundGradient,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: selected ? theme.gold : theme.border,
+              width: selected ? 1.5 : 0.8,
+            ),
+            boxShadow: selected
+                ? [
+                    BoxShadow(
+                      color: theme.gold.withValues(alpha: 0.2),
+                      blurRadius: 14,
+                      offset: const Offset(0, 6),
+                    ),
+                  ]
+                : null,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 14,
+                    height: 14,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: theme.purple,
+                      border: Border.all(color: theme.purpleLight),
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  Container(
+                    width: 14,
+                    height: 14,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: theme.gold,
+                      border: Border.all(color: theme.goldLight),
+                    ),
+                  ),
+                  const Spacer(),
+                  if (selected)
+                    Icon(Icons.check_circle, size: 17, color: theme.goldLight),
+                ],
+              ),
+              const Spacer(),
+              Text(
+                theme.name,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: AppTextStyles.bodySmall.copyWith(
+                  color: theme.textPrimary,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                theme.description,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: AppTextStyles.bodySmall.copyWith(
+                  color: theme.textSecondary,
+                  fontSize: 10,
+                  height: 1.2,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
 
@@ -739,24 +1113,29 @@ class _InfoTile extends StatelessWidget {
   final IconData icon;
   final String title;
   final String trailing;
+  final VoidCallback? onTap;
 
   const _InfoTile({
     required this.icon,
     required this.title,
     required this.trailing,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      child: Row(
-        children: [
-          Icon(icon, size: 20, color: AppColors.textMuted),
-          const SizedBox(width: 16),
-          Expanded(child: Text(title, style: AppTextStyles.titleMedium)),
-          Text(trailing, style: AppTextStyles.bodyMedium),
-        ],
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        child: Row(
+          children: [
+            Icon(icon, size: 20, color: AppColors.textMuted),
+            const SizedBox(width: 16),
+            Expanded(child: Text(title, style: AppTextStyles.titleMedium)),
+            Text(trailing, style: AppTextStyles.bodyMedium),
+          ],
+        ),
       ),
     );
   }
@@ -784,8 +1163,7 @@ class _ActionTile extends StatelessWidget {
             Icon(icon, size: 20, color: AppColors.textMuted),
             const SizedBox(width: 16),
             Expanded(child: Text(title, style: AppTextStyles.titleMedium)),
-            const Icon(Icons.chevron_right,
-                size: 18, color: AppColors.textMuted),
+            Icon(Icons.chevron_right, size: 18, color: AppColors.textMuted),
           ],
         ),
       ),
@@ -965,7 +1343,7 @@ class _ApiKeySectionState extends State<_ApiKeySection> {
         children: [
           Row(
             children: [
-              const Icon(Icons.key_outlined, size: 16, color: AppColors.gold),
+              Icon(Icons.key_outlined, size: 16, color: AppColors.gold),
               const SizedBox(width: 8),
               Text('$providerLabel API Anahtarı',
                   style: AppTextStyles.labelMedium
@@ -986,7 +1364,7 @@ class _ApiKeySectionState extends State<_ApiKeySection> {
             value: widget.selectedProvider,
             dropdownColor: AppColors.surfaceLight,
             style: AppTextStyles.bodyMedium,
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               prefixIcon: Icon(Icons.hub_outlined,
                   color: AppColors.textMuted, size: 18),
             ),
@@ -1007,7 +1385,7 @@ class _ApiKeySectionState extends State<_ApiKeySection> {
                 .copyWith(fontFamily: 'monospace', fontSize: 12),
             decoration: InputDecoration(
               hintText: keyHint,
-              prefixIcon: const Icon(Icons.vpn_key_outlined,
+              prefixIcon: Icon(Icons.vpn_key_outlined,
                   color: AppColors.textMuted, size: 18),
               suffixIcon: IconButton(
                 icon: Icon(
@@ -1029,7 +1407,7 @@ class _ApiKeySectionState extends State<_ApiKeySection> {
             value: widget.selectedModel,
             dropdownColor: AppColors.surfaceLight,
             style: AppTextStyles.bodyMedium,
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               prefixIcon: Icon(Icons.psychology_outlined,
                   color: AppColors.textMuted, size: 18),
             ),
@@ -1155,8 +1533,7 @@ class _ApiKeySectionState extends State<_ApiKeySection> {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Icon(Icons.info_outline,
-                    size: 14, color: AppColors.warning),
+                Icon(Icons.info_outline, size: 14, color: AppColors.warning),
                 const SizedBox(width: 6),
                 Expanded(
                   child: Text(

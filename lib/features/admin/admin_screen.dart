@@ -128,7 +128,7 @@ class _AdminScreenState extends State<AdminScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(gradient: AppColors.backgroundGradient),
+        decoration: BoxDecoration(gradient: AppColors.backgroundGradient),
         child: SafeArea(
           child: Column(
             children: [
@@ -137,7 +137,7 @@ class _AdminScreenState extends State<AdminScreen> {
                 child: Row(
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.arrow_back_ios_new,
+                      icon: Icon(Icons.arrow_back_ios_new,
                           size: 18, color: AppColors.textPrimary),
                       onPressed: () => context.pop(),
                     ),
@@ -147,7 +147,7 @@ class _AdminScreenState extends State<AdminScreen> {
                           textAlign: TextAlign.center),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.refresh,
+                      icon: Icon(Icons.refresh,
                           size: 20, color: AppColors.textMuted),
                       onPressed: _load,
                     ),
@@ -156,7 +156,7 @@ class _AdminScreenState extends State<AdminScreen> {
               ),
               Expanded(
                 child: _loading
-                    ? const Center(
+                    ? Center(
                         child: CircularProgressIndicator(color: AppColors.gold))
                     : _error != null
                         ? _ErrorView(error: _error!, onRetry: _load)
@@ -192,7 +192,7 @@ class _ErrorView extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.error_outline, color: AppColors.error, size: 40),
+            Icon(Icons.error_outline, color: AppColors.error, size: 40),
             const SizedBox(height: 12),
             Text(error,
                 style: AppTextStyles.bodyMedium, textAlign: TextAlign.center),
@@ -243,7 +243,7 @@ class _BodyState extends State<_Body> with SingleTickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this);
+    _tabController = TabController(length: 5, vsync: this);
     _searchController.addListener(() {
       setState(() => _query = _searchController.text.trim().toLowerCase());
     });
@@ -308,17 +308,18 @@ class _BodyState extends State<_Body> with SingleTickerProviderStateMixin {
               const Tab(text: 'İstatistik'),
               const Tab(text: 'Kullanıcılar'),
               const Tab(text: 'AI Config'),
+              const Tab(text: 'Bildirimler'),
               Tab(
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Text('Bildirimler'),
+                    const Text('Geri Bildirimler'),
                     if (widget.feedbacks.any((f) => !f.isRead)) ...[
                       const SizedBox(width: 4),
                       Container(
                         width: 7,
                         height: 7,
-                        decoration: const BoxDecoration(
+                        decoration: BoxDecoration(
                           color: AppColors.error,
                           shape: BoxShape.circle,
                         ),
@@ -351,11 +352,11 @@ class _BodyState extends State<_Body> with SingleTickerProviderStateMixin {
                       style: AppTextStyles.bodyMedium,
                       decoration: InputDecoration(
                         hintText: 'İsim veya e-posta ara...',
-                        prefixIcon: const Icon(Icons.search,
+                        prefixIcon: Icon(Icons.search,
                             size: 20, color: AppColors.textMuted),
                         suffixIcon: _query.isNotEmpty
                             ? IconButton(
-                                icon: const Icon(Icons.close,
+                                icon: Icon(Icons.close,
                                     size: 18, color: AppColors.textMuted),
                                 onPressed: () => _searchController.clear(),
                               )
@@ -417,12 +418,20 @@ class _BodyState extends State<_Body> with SingleTickerProviderStateMixin {
                 ],
               ),
 
-              // ── Tab 4: Bildirimler ──
+              // ── Tab 4: Kullanıcı bildirimleri ──
               ListView(
                 padding: const EdgeInsets.fromLTRB(20, 4, 20, 20),
                 children: [
                   _BroadcastCard(adminService: widget.adminService),
-                  const SizedBox(height: 16),
+                ],
+              ),
+
+              // ── Tab 5: Kullanıcılardan gelen geri bildirimler ──
+              ListView(
+                padding: const EdgeInsets.fromLTRB(20, 4, 20, 20),
+                children: [
+                  const _FeedbackHeader(),
+                  const SizedBox(height: 12),
                   if (widget.feedbacks.isEmpty)
                     Center(
                       child: Padding(
@@ -712,6 +721,51 @@ class _UserTile extends StatelessWidget {
   }
 }
 
+class _FeedbackHeader extends StatelessWidget {
+  const _FeedbackHeader();
+
+  @override
+  Widget build(BuildContext context) {
+    return GradientCard(
+      padding: const EdgeInsets.all(16),
+      borderColor: AppColors.gold.withValues(alpha: 0.18),
+      child: Row(
+        children: [
+          Container(
+            width: 38,
+            height: 38,
+            decoration: BoxDecoration(
+              color: AppColors.gold.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(
+              Icons.inbox_outlined,
+              size: 20,
+              color: AppColors.gold,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Kullanıcı Geri Bildirimleri',
+                    style: AppTextStyles.labelMedium),
+                const SizedBox(height: 2),
+                Text(
+                  'Talep, şikayet, dilek ve diğer mesajlar burada toplanır.',
+                  style: AppTextStyles.bodySmall
+                      .copyWith(color: AppColors.textMuted),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 // ── Feedback Tile ─────────────────────────────────────────────────────────────
 
 class _FeedbackTile extends StatelessWidget {
@@ -772,7 +826,7 @@ class _FeedbackTile extends StatelessWidget {
                   Container(
                     width: 7,
                     height: 7,
-                    decoration: const BoxDecoration(
+                    decoration: BoxDecoration(
                         color: AppColors.error, shape: BoxShape.circle),
                   ),
                 const SizedBox(width: 6),
@@ -814,8 +868,7 @@ class _AiBillingCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(Icons.payments_outlined,
-                  size: 18, color: AppColors.gold),
+              Icon(Icons.payments_outlined, size: 18, color: AppColors.gold),
               const SizedBox(width: 8),
               Text('AI Maliyet',
                   style: AppTextStyles.labelMedium
@@ -939,12 +992,12 @@ class _AiConfigCard extends StatefulWidget {
 }
 
 class _AiConfigCardState extends State<_AiConfigCard> {
-  static const _claudeModels = {
+  static final _claudeModels = {
     'claude-haiku-4-5-20251001': 'Claude Haiku 4.5 (Hızlı)',
     'claude-sonnet-4-6': 'Claude Sonnet 4.6 (Dengeli)',
     'claude-opus-4-7': 'Claude Opus 4.7 (Güçlü)',
   };
-  static const _openaiModels = {
+  static final _openaiModels = {
     'o4-mini': 'o4-mini (Hızlı)',
     'o3': 'o3 (Güçlü)',
   };
@@ -1017,8 +1070,7 @@ class _AiConfigCardState extends State<_AiConfigCard> {
         children: [
           Row(
             children: [
-              const Icon(Icons.psychology_outlined,
-                  size: 18, color: AppColors.gold),
+              Icon(Icons.psychology_outlined, size: 18, color: AppColors.gold),
               const SizedBox(width: 8),
               Text('AI Sağlayıcı',
                   style: AppTextStyles.labelMedium
@@ -1045,7 +1097,7 @@ class _AiConfigCardState extends State<_AiConfigCard> {
             initialValue: _provider,
             dropdownColor: AppColors.surfaceLight,
             style: AppTextStyles.bodyMedium,
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               prefixIcon: Icon(Icons.hub_outlined,
                   color: AppColors.textMuted, size: 18),
             ),
@@ -1065,7 +1117,7 @@ class _AiConfigCardState extends State<_AiConfigCard> {
                 : _currentModels.keys.first,
             dropdownColor: AppColors.surfaceLight,
             style: AppTextStyles.bodyMedium,
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               prefixIcon: Icon(Icons.model_training_outlined,
                   color: AppColors.textMuted, size: 18),
             ),
@@ -1089,7 +1141,7 @@ class _AiConfigCardState extends State<_AiConfigCard> {
                 .copyWith(fontFamily: 'monospace', fontSize: 12),
             decoration: InputDecoration(
               hintText: 'Değiştirmek için yeni anahtarı gir',
-              prefixIcon: const Icon(Icons.vpn_key_outlined,
+              prefixIcon: Icon(Icons.vpn_key_outlined,
                   color: AppColors.textMuted, size: 18),
               suffixIcon: IconButton(
                 icon: Icon(
@@ -1109,7 +1161,7 @@ class _AiConfigCardState extends State<_AiConfigCard> {
             child: ElevatedButton.icon(
               onPressed: _saving ? null : _save,
               icon: _saving
-                  ? const SizedBox(
+                  ? SizedBox(
                       width: 16,
                       height: 16,
                       child: CircularProgressIndicator(
@@ -1187,6 +1239,7 @@ class _BroadcastCardState extends State<_BroadcastCard> {
   final _titleController = TextEditingController();
   final _messageController = TextEditingController();
   bool _sending = false;
+  String _type = 'affirmation';
 
   @override
   void dispose() {
@@ -1202,7 +1255,11 @@ class _BroadcastCardState extends State<_BroadcastCard> {
 
     setState(() => _sending = true);
     try {
-      final result = await widget.adminService.sendBroadcast(title, message);
+      final result = await widget.adminService.sendBroadcast(
+        title,
+        message,
+        type: _type,
+      );
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -1237,9 +1294,10 @@ class _BroadcastCardState extends State<_BroadcastCard> {
         children: [
           Row(
             children: [
-              const Icon(Icons.campaign_outlined, color: AppColors.gold, size: 18),
+              Icon(Icons.campaign_outlined, color: AppColors.gold, size: 18),
               const SizedBox(width: 8),
-              Text('Toplu Bildirim Gönder', style: AppTextStyles.labelMedium),
+              Text('Kullanıcılara Bildirim Gönder',
+                  style: AppTextStyles.labelMedium),
             ],
           ),
           const SizedBox(height: 14),
@@ -1250,6 +1308,20 @@ class _BroadcastCardState extends State<_BroadcastCard> {
               labelText: 'Başlık',
               hintText: 'Günün Olumlaması',
             ),
+          ),
+          const SizedBox(height: 10),
+          DropdownButtonFormField<String>(
+            initialValue: _type,
+            dropdownColor: AppColors.surfaceLight,
+            style: AppTextStyles.bodyMedium,
+            decoration: const InputDecoration(labelText: 'Bildirim tipi'),
+            items: const [
+              DropdownMenuItem(value: 'affirmation', child: Text('Olumlama')),
+              DropdownMenuItem(value: 'announcement', child: Text('Duyuru')),
+            ],
+            onChanged: _sending
+                ? null
+                : (value) => setState(() => _type = value ?? 'affirmation'),
           ),
           const SizedBox(height: 10),
           TextField(
@@ -1276,10 +1348,11 @@ class _BroadcastCardState extends State<_BroadcastCard> {
                 ),
               ),
               child: _sending
-                  ? const SizedBox(
+                  ? SizedBox(
                       width: 18,
                       height: 18,
-                      child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.background),
+                      child: CircularProgressIndicator(
+                          strokeWidth: 2, color: AppColors.background),
                     )
                   : const Text('Tüm Kullanıcılara Gönder'),
             ),

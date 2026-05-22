@@ -19,13 +19,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   int _currentPage = 0;
   bool _legalAccepted = false;
 
-  static const _icons = [
+  static final _icons = [
     Icons.pin_outlined,
     Icons.self_improvement,
     Icons.insights,
   ];
 
-  static const _colors = [
+  static final _colors = [
     AppColors.gold,
     AppColors.purple,
     AppColors.midnightBlue,
@@ -58,7 +58,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(gradient: AppColors.backgroundGradient),
+        decoration: BoxDecoration(gradient: AppColors.backgroundGradient),
         child: SafeArea(
           child: Column(
             children: [
@@ -95,9 +95,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     width: _currentPage == i ? 24 : 8,
                     height: 8,
                     decoration: BoxDecoration(
-                      color: _currentPage == i
-                          ? AppColors.gold
-                          : AppColors.border,
+                      color:
+                          _currentPage == i ? AppColors.gold : AppColors.border,
                       borderRadius: BorderRadius.circular(4),
                     ),
                   );

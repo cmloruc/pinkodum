@@ -62,7 +62,7 @@ class _SingleAnalysisResultScreenState
     final a = widget.analysis;
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(gradient: AppColors.backgroundGradient),
+        decoration: BoxDecoration(gradient: AppColors.backgroundGradient),
         child: SafeArea(
           child: Column(
             children: [
@@ -106,17 +106,17 @@ class _SingleAnalysisResultScreenState
                       ),
                       const SizedBox(height: 16),
                       // Premium çekim kartı
-                      _PremiumHook(
-                          onTap: () async {
-                            final prefs = await SharedPreferences.getInstance();
-                            final user = AuthService(prefs).currentUser;
-                            if (!context.mounted) return;
-                            if (user?.isAdmin == true || user?.hasActivePremium == true) {
-                              context.push(AppRoutes.premiumLoading, extra: a);
-                            } else {
-                              context.push(AppRoutes.premiumPurchase, extra: a);
-                            }
-                          }),
+                      _PremiumHook(onTap: () async {
+                        final prefs = await SharedPreferences.getInstance();
+                        final user = AuthService(prefs).currentUser;
+                        if (!context.mounted) return;
+                        if (user?.isAdmin == true ||
+                            user?.hasActivePremium == true) {
+                          context.push(AppRoutes.premiumLoading, extra: a);
+                        } else {
+                          context.push(AppRoutes.premiumPurchase, extra: a);
+                        }
+                      }),
                       const SizedBox(height: 20),
                       GhostButton(
                         label: AppStrings.btnNewAnalysis,
@@ -149,7 +149,7 @@ class _ResultAppBar extends StatelessWidget {
       child: Row(
         children: [
           IconButton(
-            icon: const Icon(Icons.arrow_back_ios_new,
+            icon: Icon(Icons.arrow_back_ios_new,
                 size: 18, color: AppColors.textPrimary),
             onPressed: () => context.pop(),
           ),
@@ -161,13 +161,13 @@ class _ResultAppBar extends StatelessWidget {
             ),
           ),
           sharing
-              ? const SizedBox(
+              ? SizedBox(
                   width: 20,
                   height: 20,
                   child: CircularProgressIndicator(
                       strokeWidth: 2, color: AppColors.gold))
               : IconButton(
-                  icon: const Icon(Icons.picture_as_pdf_outlined,
+                  icon: Icon(Icons.picture_as_pdf_outlined,
                       size: 20, color: AppColors.gold),
                   onPressed: onShare,
                   tooltip: 'PDF Rapor',
@@ -290,7 +290,7 @@ class _ElementTeaser extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(Icons.auto_awesome_mosaic_outlined,
+              Icon(Icons.auto_awesome_mosaic_outlined,
                   size: 14, color: AppColors.gold),
               const SizedBox(width: 6),
               Text('Element Haritan',
@@ -343,7 +343,7 @@ class _ElementTeaser extends StatelessWidget {
             ),
             child: Row(
               children: [
-                const Icon(Icons.lock_outline, size: 14, color: AppColors.gold),
+                Icon(Icons.lock_outline, size: 14, color: AppColors.gold),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
@@ -412,8 +412,7 @@ class _PremiumHook extends StatelessWidget {
           children: [
             Row(
               children: [
-                const Icon(Icons.auto_awesome,
-                    size: 18, color: AppColors.background),
+                Icon(Icons.auto_awesome, size: 18, color: AppColors.background),
                 const SizedBox(width: 8),
                 Text(
                   'Detaylı Analizi Aç',
@@ -421,7 +420,7 @@ class _PremiumHook extends StatelessWidget {
                       color: AppColors.background, fontWeight: FontWeight.bold),
                 ),
                 const Spacer(),
-                const Icon(Icons.arrow_forward_ios,
+                Icon(Icons.arrow_forward_ios,
                     size: 14, color: AppColors.background),
               ],
             ),
@@ -435,7 +434,7 @@ class _PremiumHook extends StatelessWidget {
                   padding: const EdgeInsets.only(bottom: 5),
                   child: Row(
                     children: [
-                      const Icon(Icons.check_circle,
+                      Icon(Icons.check_circle,
                           size: 13, color: AppColors.background),
                       const SizedBox(width: 6),
                       Text(

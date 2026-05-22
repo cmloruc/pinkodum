@@ -64,7 +64,7 @@ class _RelationshipResultScreenState extends State<RelationshipResultScreen> {
     final a = widget.analysis;
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(gradient: AppColors.backgroundGradient),
+        decoration: BoxDecoration(gradient: AppColors.backgroundGradient),
         child: SafeArea(
           child: Column(
             children: [
@@ -89,7 +89,7 @@ class _RelationshipResultScreenState extends State<RelationshipResultScreen> {
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Icon(Icons.favorite,
+                              Icon(Icons.favorite,
                                   size: 12, color: AppColors.purpleLight),
                               const SizedBox(width: 6),
                               Text(a.relationshipType,
@@ -144,17 +144,17 @@ class _RelationshipResultScreenState extends State<RelationshipResultScreen> {
                       const SizedBox(height: 16),
 
                       // ── Premium çekim kartı ───────────────────────────────
-                      _RelPremiumHook(
-                          onTap: () async {
-                            final prefs = await SharedPreferences.getInstance();
-                            final user = AuthService(prefs).currentUser;
-                            if (!context.mounted) return;
-                            if (user?.isAdmin == true || user?.hasActivePremium == true) {
-                              context.push(AppRoutes.relPremiumLoading, extra: a);
-                            } else {
-                              context.push(AppRoutes.relPremiumPurchase, extra: a);
-                            }
-                          }),
+                      _RelPremiumHook(onTap: () async {
+                        final prefs = await SharedPreferences.getInstance();
+                        final user = AuthService(prefs).currentUser;
+                        if (!context.mounted) return;
+                        if (user?.isAdmin == true ||
+                            user?.hasActivePremium == true) {
+                          context.push(AppRoutes.relPremiumLoading, extra: a);
+                        } else {
+                          context.push(AppRoutes.relPremiumPurchase, extra: a);
+                        }
+                      }),
                       const SizedBox(height: 20),
 
                       const SizedBox(height: 8),
@@ -190,7 +190,7 @@ class _RelAppBar extends StatelessWidget {
       child: Row(
         children: [
           IconButton(
-            icon: const Icon(Icons.arrow_back_ios_new,
+            icon: Icon(Icons.arrow_back_ios_new,
                 size: 18, color: AppColors.textPrimary),
             onPressed: () => context.pop(),
           ),
@@ -200,13 +200,13 @@ class _RelAppBar extends StatelessWidget {
                 textAlign: TextAlign.center),
           ),
           sharing
-              ? const SizedBox(
+              ? SizedBox(
                   width: 20,
                   height: 20,
                   child: CircularProgressIndicator(
                       strokeWidth: 2, color: AppColors.gold))
               : IconButton(
-                  icon: const Icon(Icons.picture_as_pdf_outlined,
+                  icon: Icon(Icons.picture_as_pdf_outlined,
                       size: 20, color: AppColors.gold),
                   onPressed: onShare,
                   tooltip: 'PDF Rapor'),
@@ -355,7 +355,7 @@ class _CombinedPinSection extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.auto_awesome, size: 14, color: AppColors.gold),
+              Icon(Icons.auto_awesome, size: 14, color: AppColors.gold),
               const SizedBox(width: 8),
               Text(
                 'Ortak Pin Kodunuz',
@@ -408,7 +408,7 @@ class _CombinedElementTeaser extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(Icons.auto_awesome_mosaic_outlined,
+              Icon(Icons.auto_awesome_mosaic_outlined,
                   size: 14, color: AppColors.gold),
               const SizedBox(width: 6),
               Text('Ortak Element Haritanız',
@@ -495,7 +495,7 @@ class _CombinedElementTeaser extends StatelessWidget {
             ),
             child: Row(
               children: [
-                const Icon(Icons.lock_outline, size: 14, color: AppColors.gold),
+                Icon(Icons.lock_outline, size: 14, color: AppColors.gold),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
@@ -664,8 +664,7 @@ class _RelPremiumHook extends StatelessWidget {
           children: [
             Row(
               children: [
-                const Icon(Icons.auto_awesome,
-                    size: 18, color: AppColors.background),
+                Icon(Icons.auto_awesome, size: 18, color: AppColors.background),
                 const SizedBox(width: 8),
                 Text(
                   'Detaylı İlişki Analizini Aç',
@@ -673,7 +672,7 @@ class _RelPremiumHook extends StatelessWidget {
                       color: AppColors.background, fontWeight: FontWeight.bold),
                 ),
                 const Spacer(),
-                const Icon(Icons.arrow_forward_ios,
+                Icon(Icons.arrow_forward_ios,
                     size: 14, color: AppColors.background),
               ],
             ),
@@ -687,7 +686,7 @@ class _RelPremiumHook extends StatelessWidget {
                   padding: const EdgeInsets.only(bottom: 5),
                   child: Row(
                     children: [
-                      const Icon(Icons.check_circle,
+                      Icon(Icons.check_circle,
                           size: 13, color: AppColors.background),
                       const SizedBox(width: 6),
                       Text(

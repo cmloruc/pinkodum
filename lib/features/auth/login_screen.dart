@@ -32,7 +32,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
-    setState(() { _loading = true; _error = null; });
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
     try {
       final prefs = await SharedPreferences.getInstance();
       await AuthService(prefs).login(
@@ -41,7 +44,8 @@ class _LoginScreenState extends State<LoginScreen> {
       );
       if (mounted) context.go(AppRoutes.home);
     } catch (e) {
-      if (mounted) setState(() => _error = e.toString().replaceFirst('Exception: ', ''));
+      if (mounted)
+        setState(() => _error = e.toString().replaceFirst('Exception: ', ''));
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -51,7 +55,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(gradient: AppColors.backgroundGradient),
+        decoration: BoxDecoration(gradient: AppColors.backgroundGradient),
         child: SafeArea(
           child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 24),
@@ -61,7 +65,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.arrow_back_ios_new,
+                    icon: Icon(Icons.arrow_back_ios_new,
                         size: 18, color: AppColors.textPrimary),
                     onPressed: () => context.pop(),
                   ),
@@ -75,8 +79,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     controller: _emailCtrl,
                     label: 'E-posta',
                     keyboardType: TextInputType.emailAddress,
-                    validator: (v) =>
-                        (v == null || !v.contains('@')) ? 'Geçerli e-posta gir' : null,
+                    validator: (v) => (v == null || !v.contains('@'))
+                        ? 'Geçerli e-posta gir'
+                        : null,
                   ),
                   const SizedBox(height: 16),
                   AuthTextField(

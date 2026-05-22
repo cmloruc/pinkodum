@@ -10,12 +10,15 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'app/app.dart';
+import 'core/constants/app_colors.dart';
 import 'core/constants/app_config.dart';
+import 'core/services/theme_service.dart';
 import 'data/services/auth_service.dart';
 import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await ThemeService.instance.init();
   unawaited(_initializeFcm());
 
   // Durum çubuğu rengi
@@ -50,7 +53,16 @@ Future<void> _initializeFcm() async {
 Future<void> _setupFcm() async {
   final messaging = FirebaseMessaging.instance;
   try {
-    await messaging.requestPermission(alert: true, badge: true, sound: true);
+    // Screenshot modunda bildirim izni isteme
+    const screenshotMode = bool.fromEnvironment('SCREENSHOT_MODE', defaultValue: false);
+    if (!screenshotMode) {
+      await messaging.requestPermission(alert: true, badge: true, sound: true);
+    }
+    await messaging.setForegroundNotificationPresentationOptions(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
 
     final token = await _getFcmToken(messaging);
     if (token != null) await _saveFcmToken(token);
@@ -59,6 +71,7 @@ Future<void> _setupFcm() async {
       _saveFcmToken,
       onError: (Object error) => debugPrint('FCM token refresh error: $error'),
     );
+    FirebaseMessaging.onMessage.listen(_showForegroundMessage);
 
     // Giris yapilinca token'i tekrar kaydet.
     AuthService.authChanges.addListener(() {
@@ -67,6 +80,47 @@ Future<void> _setupFcm() async {
   } catch (e) {
     debugPrint('FCM setup error: $e');
   }
+}
+
+void _showForegroundMessage(RemoteMessage message) {
+  final notification = message.notification;
+  final title = notification?.title ?? message.data['title'] as String?;
+  final body = notification?.body ?? message.data['body'] as String?;
+  if (title == null && body == null) return;
+
+  final messenger = rootScaffoldMessengerKey.currentState;
+  messenger
+    ?..hideCurrentMaterialBanner()
+    ..showMaterialBanner(
+      MaterialBanner(
+        backgroundColor: AppColors.surface,
+        leading:
+            Icon(Icons.notifications_active_outlined, color: AppColors.action),
+        content: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (title != null)
+              Text(
+                title,
+                style: TextStyle(
+                  color: AppColors.textPrimary,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            if (body != null) ...[
+              const SizedBox(height: 2),
+              Text(body, style: TextStyle(color: AppColors.textSecondary)),
+            ],
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => messenger.hideCurrentMaterialBanner(),
+            child: const Text('Kapat'),
+          ),
+        ],
+      ),
+    );
 }
 
 Future<void> _syncFcmToken(FirebaseMessaging messaging) async {

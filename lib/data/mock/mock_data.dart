@@ -108,92 +108,78 @@ class MockAnalysisData {
           'aslında başkalarına ilham vermenin tam da senin doğanda olduğunu herkes hissediyor. '
           'Bir hedef koyduğunda arkana bakmadan ilerliyorsun; bu özelliğin hem en büyük gücün hem de zaman zaman gözden kaçırdıkların oluyor. '
           'İçinde sürekli yanan bir "daha iyisini yapabilirim" ateşi var — bu seni diri tutuyor.',
-
       'sen bir odaya girdiğinde havayı değiştiren birisin. '
           'İnsanlar seni fark ediyor; sadece ne söylediğin için değil, nasıl durduğun için. '
           'Harekete geçmek senin için düşünmekten daha kolay — bu yüzden bazen planlamadan önce koştuğunu fark ediyorsun. '
           'Bağımsızlık senin için bir lüks değil, temel bir ihtiyaç. '
           'Kendi kararlarını kendin vermek, senin için özgürlüğün ta kendisi.',
-
       'liderlik sende sonradan öğrenilmiş bir beceri değil, içinden gelen bir çağrı. '
           'Karmaşık durumlarda bile net düşünebiliyorsun ve bu netlik çevrendekiler için bir çıpa oluyor. '
           'Başarıya olan açlığın seni ilerletiyor ama zaman zaman bu açlığın seni dinlendirmediğini de fark ediyorsun. '
           'Yanlış yapmaktan değil, hareketsiz kalmaktan korkuyorsun — ve bu korku seni çoğu zaman doğru yere götürüyor.',
     ],
-
     2: [
       'sen dışarıdan sakin ve uyumlu görünsen de, iç dünyanda oldukça derin hisseden birisin. '
           'İnsanların enerjisini çabuk alıyorsun ve bazen bunun seni yorduğunu fark ediyorsun. '
           'Empatin o kadar güçlü ki, bazen başkasının acısını ya da sevincini kendi içinde yaşıyorsun. '
           'Sessiz ama güçlü birisin — söylemeden çok hissettirerek etki yaratıyorsun. '
           'İlişkiler senin için her şeyin merkezinde; bağ kurmak, anlaşılmak ve anlamak seni besleyen şeyler.',
-
       'sezgilerine güvenmek sana doğal geliyor ama bazen bu iç sesin doğru söylediğini kabul etmek için dışarıdan onay arıyorsun. '
           'Halbuki o iç ses çoğunlukla haklı. '
           'İnsanları anlama yeteneğin seni hem çok değerli hem de zaman zaman yorgun bırakıyor. '
           'Ortamlarda en ince titreşimleri bile alıyorsun — bu bir hediye ama aynı zamanda bir yük. '
           'Bazen tek ihtiyacın sessizlik ve kendi enerjinle yalnız kalmak.',
-
       'sen köprü kuran birisin — iki taraf arasında, iki bakış arasında, iki insan arasında. '
           'Bu arabuluculuk yeteneği senin doğana o kadar işlemiş ki çoğu zaman farkında bile olmadan yapıyorsun. '
           'İçinde sürekli bir denge arayışı var; hem kendin olmak hem de çevreninle uyum içinde olmak istiyorsun. '
           'Duygusal zekan yüksek — insanların söylemediklerini de duyabiliyorsun. '
           'Bu güç, seni özel kılıyor ama bazen de kalabalıktan uzaklaşmak istemen için tam bir neden.',
     ],
-
     3: [
       'seninle aynı odada olmak insanlara iyi hissettiriyor — bunu kasıtlı yapmıyorsun, sadece oluyorsun. '
           'Yaratıcılığın ve iletişim yeteneğin seni çevrendekiler için hem eğlenceli hem de ilham verici kılıyor. '
           'Fikirler sende hızla doğuyor; sorun onları hayata geçirirken odak tutmak. '
           'İfade etmek — yazmak, konuşmak, yaratmak — senin en doğal nefes alma biçimin. '
           'Duygularını kelimelerle, renklerle ya da sesle dışa vurabildiğinde içinde bir özgürleşme hissediyorsun.',
-
       'sen hayatı büyük bir tuval gibi görüyorsun ve bu tuvali her rengiyle doldurmak istiyorsun. '
           'Sıkıcı olmak, tekrar etmek, rutine girmek seni bunaltıyor. '
           'İnsanlar senin yanındayken gülerken kendilerini daha hafif hissediyorlar — bu bir mucize değil, senin enerjin. '
           'Bazen çok fazla şey başlayıp hiçbirini bitirememek seni zorlasa da, '
           'başlama cesareti dahi pek çok insanın sahip olmadığı bir şey.',
-
       'iletişim senin süper gücün. '
           'Doğru kelimeyi, doğru anlatımı bulma yeteneğin seni hem sosyal ortamlarda hem de yaratıcı alanlarda öne çıkarıyor. '
           'İnsanlar sana sırlarını anlatıyor çünkü onları gerçekten dinlediğini hissediyorlar. '
           'Hayata karşı doğal bir merakın var; yeni şeyler öğrenmek, yeni insanlarla tanışmak seni canlı tutuyor. '
           'Kendini ifade etme cesaretin, çevrendekiler için de ilham kaynağına dönüşüyor.',
     ],
-
     4: [
       'her şeyde sağlam temeller inşa etmek senin için doğal bir içgüdü. '
           'Güvenilir, tutarlı ve planlı yapın seni çevrendekiler için bir kaya gibi hissettiriyor. '
           'İnsanlar bir şeyi sana söylediklerinde unutmayacağını, üstüne düşüneceğini ve geri döneceğini biliyorlar. '
           'Bu güven, pek çok insanın sana sığınmasının nedeni. '
           'Adım adım ilerlemeyi seversin; acele etmek sana göre değil ama bir kez kararın netleştiğinde kararlılığın sarsılmaz.',
-
       'sen söz verdiğinde tutarsın. Bu basit görünen özellik aslında pek az insanda var. '
           'Düzen ve yapı sana güvenlik hissi veriyor; belirsizlik ise içinde hafif bir rahatsızlık yaratıyor. '
           'Çalışmayı, emek vermeyi, bir şeyi layıkıyla yapmayı içselleştirmişsin. '
           'Sabır senin en büyük silahın — çoğu insan yarı yolda bırakırken sen hedefe ulaşana kadar devam ediyorsun. '
           'Kalıcı olanı, sağlam olanı, gerçek olanı tercih ediyorsun.',
-
       'pratik zekân ve sistematik düşünce yapın hayatı gerçekten daha iyi hale getiriyor. '
           'Bir problem gördüğünde çözüm üretmek sana doğal geliyor; duygusal tepkilerden çok somut adımları tercih ediyorsun. '
           'Çevrendekiler "ona sorarım, o bilir" ya da "onu aramam yeter" diyor — bu güven duygusu senin için büyük bir değer. '
           'Bazen aşırı sorumlu hissetmek ya da her şeyi kontrol etmek istemek seni yıpratıyor; '
           'ama bu da seni sen yapan şeyin bir parçası.',
     ],
-
     5: [
       'özgürlük senin için sadece bir kavram değil, bir ihtiyaç. '
           'Değişimden besleniyorsun ve hayatın farklı renklerini keşfetmek seni diri tutuyor. '
           'Rutine girdiğinde ya da sıkışmış hissettiğinde içinde bir alarm çalıyor — bu alarm seni harekete geçiriyor. '
           'Yeni deneyimler, yeni insanlar, yeni fikirler: bunlar senin için oksijen gibi. '
           'Bazen bu çok yönlülük dağınıklık gibi görünse de, aslında yaşamı farklı katmanlarıyla anlama kapasiteni gösteriyor.',
-
       'sen tek bir yerde, tek bir şekilde kalmaya programlanmamışsın. '
           'Hayat sana ne kadar farklı kapı açarsa, o kadar büyüyorsun. '
           'İnsanlar bazen seni zor anlıyor çünkü bugün istediğin yarın değişebiliyor — ama bu tutarsızlık değil, gelişim. '
           'Risk almaktan çekinmiyorsun; çünkü hareketsiz kalmak senin için en büyük risk. '
           'Macera, büyük şeyler olmak zorunda değil — bazen tanımadığın bir sokağa girmek bile senin için yeterince heyecan verici.',
-
       'uyum sağlama yeteneğin olağanüstü. '
           'En zor koşullarda bile bir çözüm yolu buluyor, yeni bir başlangıç noktası yaratıyorsun. '
           'Değişim seni korkutmuyor, aksine içinde bir parıltı yakıyor. '
@@ -201,20 +187,17 @@ class MockAnalysisData {
           'sınırlanmaktan duyduğun derin rahatsızlık yüzünden. '
           'Kendine dürüst olmak, senin en önemli pusulalarından biri.',
     ],
-
     6: [
       'sevdiklerini korumak ve onlara destek olmak senin için en doğal şey. '
           'Empatin yüksek, kalbinde her zaman başkalarına yer açıyorsun. '
           'Birileri zor bir dönemde olduğunda ilk aklına gelen şey "ne yapabilirim?" oluyor — bu güzellik, sende gerçek. '
           'Sorumluluk duygun güçlü; bazen bu seni yorsa da, aynı sorumluluk seni çevrendekiler için vazgeçilmez kılıyor. '
           'Sevgi senin için hem en güçlü motivasyon hem de en büyük kırılganlık.',
-
       'sen bir sığınak yaratırsın — insanlar yanında olduğunda daha güvende hissediyor. '
           'Bu his tesadüf değil; sen bunu bilinçli ya da bilinçsiz, sürekli yapıyorsun. '
           'Güzelliği fark etme ve takdir etme yeteneğin var; bir çiçek, bir müzik, bir söz seni gerçekten dokunuyor. '
           'Bazen başkalarına o kadar çok veriyorsun ki kendi bardağının boşaldığını geç fark ediyorsun. '
           'Ama verdiğin her şey, sana farklı bir biçimde geri dönüyor.',
-
       'uyum ve huzur senin için derin bir ihtiyaç. '
           'Çatışma ortamları seni gerior ve bazen huzuru korumak için kendi ihtiyaçlarından ödün veriyorsun. '
           'Çevrendeki insanların iyiliğini gerçekten önemsiyorsun — bu samimi ilgi, seni farklı kılıyor. '
@@ -222,60 +205,51 @@ class MockAnalysisData {
           'seni yaşam kalitesine değer veren biri yapıyor. '
           'Kendinle ilgilenmeyi de sevmek olarak görmeye başladığında, çok daha dengeli hissedeceksin.',
     ],
-
     7: [
       'yüzeyin altındaki gerçeği görmek senin için bir tutku. '
           'Soru sormak, araştırmak ve derinlemesine düşünmek seni besleyen şeyler. '
           'Çoğu insan "yeterince iyi" derken sen hâlâ "peki ama neden?" diye soruyorsun. '
           'Bu merak seni olağanüstü bir öğrenici yapıyor; ama aynı zamanda zaman zaman seni sonsuz bir düşünce labirentine sokuyor. '
           'Yalnızlık senin için hem bir ihtiyaç hem de en verimli olduğun ortam.',
-
       'gözlemlemek, analiz etmek, anlamak — bunlar senin dünyayla bağlantı kurma biçimlerin. '
           'Sezgisel düşünce ve mantıksal analizi bir arada taşıyorsun; bu nadir bir kombinasyon. '
           'Güven inşa etmek senin için zaman alıyor ama bir kez kurulduğunda derinlemesine bağlanıyorsun. '
           'Kalabalıktan ziyade birkaç gerçek bağlantıyı tercih ediyorsun. '
           'İçinde sürekli bir anlam arayışı var — ve bu arayış seni hem yoruyor hem de şaşırtıcı yerlere götürüyor.',
-
       'bilgelik senin için bir hedef değil, doğal bir yolculuk. '
           'Kitaplara, insanlara, deneyimlere olan merakın seni sürekli büyütüyor. '
           'Zaman zaman çevrendekiler seni çok sessiz ya da uzak buluyor ama aslında sen o anlarda en yoğun biçimde düşünüyorsun. '
           'Gerçeği bulmak, sırları çözmek, görünmeyeni görmek — bunlar seni harekete geçiren şeyler. '
           'Dünya görüşün geniş; bu genişlik, seni çevrendekiler için değerli bir rehber yapıyor.',
     ],
-
     8: [
       'büyük hedefler koyuyorsun ve bunlara ulaşmak için azimle çalışıyorsun. '
           'Başarı ve güç senin için soyut kavramlar değil, somut hedefler. '
           'Zorluklarla karşılaştığında çoğu insan geri çekilirken sen daha da sıkı tutunuyorsun. '
           'Bu azim seni çok ileriye taşıyor ama aynı zamanda dinlenmeni, kendinle nazik olmanı zorlaştırabiliyor. '
           'Başardığında bile "yeterince büyük mü?" diye soruyorsun kendine — bu hem gücün hem de dinmez yorgunluğun kaynağı.',
-
       'sen doğanın sana verdiği bir güce sahipsin ve bunu iş hayatında, ilişkilerinde, her alanda hissediyorsun. '
           'İnsanlar sana güveniyor çünkü bir şeyin üstesinden geleceğini biliyorlar. '
           'Para, kariyer, başarı — bunları çok somut görüyorsun ve bunlara ulaşmak için stratejik düşünüyorsun. '
           'Ama zaman zaman bu odak, daha ince şeyleri — sezgileri, duyguları, anları — geri plana atıyor. '
           'Güçlü olmak kadar savunmasız olabilmek de seni tamamlıyor.',
-
       'liderlik ve etki senin için içgüdüsel. '
           'Bir grupta bulunduğunda ya doğal olarak önde yer alıyorsun ya da arkadan yönlendirecek kadar akıllı davranıyorsun. '
           'Maddi dünyada güçlü olmak istiyorsun ama bu sadece hırs değil; derininde bir güvenlik ihtiyacı yatıyor. '
           'Azmin ve disiplinin seni çok uzaklara taşıyacak; tek tehlike, yolda neyin gerçekten önemli olduğunu unutmak. '
           'Başarının tadını en çok paylaşıldığında çıkarıyorsun.',
     ],
-
     9: [
       'insanlığa duyduğun derin bağ seni özel kılıyor. '
           'Gördüğün yerde iyilik yapmak içinden geldiği için yapıyorsun; bir karşılık beklemiyorsun. '
           'Büyük resmi görebiliyorsun — tek bir olayın arkasındaki bağlantıları, örüntüleri, anlamları. '
           'Bu vizyon seni hem ilham verici bir insan hem de bazen yanlış anlaşılan biri yapıyor. '
           'Tüm insanlığı kucaklamak isterken bazen en yakınındakilere yeterince zaman kalmıyor — bu senin en büyük çelişkin.',
-
       'sen döngüleri tamamlayan birisin. '
           'Başladığın her şeyde bir anlam arıyorsun ve anlam bulmadan bırakmak seni rahatsız ediyor. '
           'Şefkat senin için hem bir güç hem de bir kırılganlık. '
           'Dünyanın acısını çok derinden hissediyorsun; bu hassasiyet seni hem çok insan hem de çok yorgun yapıyor. '
           'Ama aynı hassasiyet, insanlara şifa verebilme kapasiteni de doğuruyor.',
-
       'evrensel bir sevgi taşıyorsun — bu soyut bir ifade değil, davranışlarına yansıyan gerçek bir hal. '
           'Farklı insanları, farklı bakış açılarını anlayabiliyorsun; bu empati seni çok değerli bir köprü yapıyor. '
           'Bazen çok fazla şeyi içselleştirip ağır yükler taşıyorsun. '
@@ -325,42 +299,34 @@ class MockAnalysisData {
         'Yavaşlamak seni zayıflatmaz; tersine derinleştirir. '
         'Her zaman önde olmak zorunda değilsin — bazen yan yana yürümek de bir liderlik biçimi. '
         'Dinlenmeyi ve durmayı da kendin için hak ettiğin şeyler arasına koyabilirsin.',
-
     2: 'başkalarının duygularını o kadar derinden hissediyorsun ki zaman zaman kendininkini göz ardı edebiliyorsun. '
         'Kendi ihtiyaçlarına da yer açmak önemli. '
         '"Hayır" demek, ilişkiyi bitirmez; aksine daha sağlıklı kılar. '
         'Başkalarına gösterdiğin anlayışın bir kısmını kendine de gösterebilirsin.',
-
     3: 'harika fikirlerin bazen dağınık bir enerjiyle buluşuyor. '
         'Odaklanmak ve tamamlamak, başlamak kadar güçlü bir yetkinlik. '
         'Her şeyi aynı anda yapmak zorunda değilsin; bir şeyi iyi yapmak, on şeyi yarım bırakmaktan çok daha tatmin edici. '
         'Sürekli uyarıklık yerine zaman zaman derin bir odak, seni çok daha ileri götürebilir.',
-
     4: 'her şeyi kontrolünde tutma isteğin zaman zaman seni strese sokabiliyor. '
         'Esnek olmak, plansız olmak anlamına gelmiyor. '
         'Bazen beklenmedik olanı bırakıp akışa girmek, en sağlam planından daha güzel bir yere götürebilir seni. '
         'Kontrol etmediğin şeylerin de güzel olabileceğine güvenmek, büyük bir özgürlük.',
-
     5: 'köklenme ve bağlılık konusunda zaman zaman çekingen davranıyorsun. '
         'Özgürlük, bağları kesmek zorunda değil. '
         'Derin bir bağlılık içinde bile özgür kalabilirsin; bu ikisi birbirini dışlamaz. '
         'Bir yere ya da birine ait olmak, seni sınırlamaz — seni daha güçlü kılar.',
-
     6: 'herkesi memnun etmeye çalışmak seni yorabiliyor. '
         '"Hayır" diyebilmek de bir sevgi dilidir — hem kendine hem de karşındakine saygının ifadesi. '
         'Sınır koymak, ilgiyi kesmek değil; ilgiyi sürdürülebilir kılmaktır. '
         'Kendi bardağın boşken başkasına dolduramazsın; önce kendini doldurman gerekiyor.',
-
     7: 'aşırı analiz kimi zaman harekete geçmeni geciktirebiliyor. '
         'Tüm cevapları bulmadan da ilerleyebilirsin. '
         'Mükemmel plan, çoğu zaman yapılmamış plandan daha az değer taşır. '
         'Bazen en büyük cevaplar, düşünürken değil yaşarken bulunuyor.',
-
     8: 'başarıya odaklanırken ilişkileri ve küçük anları ikinci plana atabiliyorsun. '
         'En büyük başarın, sevdiklerinle paylaştığın zamandır. '
         'Mola vermek, zayıflık değil — yeniden güçlenmenin yolu. '
         'Kendine izin vermeyi, haketmek için bir sonuç beklemeyi bırakabilirsin.',
-
     9: 'herkese verirken kendin için bir şey kalmıyor bazen. '
         'Kendini doldurmak da bir sorumluluk — hem kendin için hem de başkalarına verebilmeye devam edebilmek için. '
         'Tüm dünyayı iyileştirmeye çalışırken kendi küçük dünyandaki mutluluğu kaçırabiliyorsun. '
@@ -469,8 +435,7 @@ class MockAnalysisData {
         .replaceAll('{n2}', name2);
   }
 
-  static String _sexualLevel(
-      int fire, int water, int air, String energyType) {
+  static String _sexualLevel(int fire, int water, int air, String energyType) {
     if (fire >= 3) return 'very_high';
     if (fire == 2 && energyType == 'Baskın') return 'high';
     if (fire == 2) return 'high_moderate';
@@ -481,41 +446,31 @@ class MockAnalysisData {
   }
 
   static const Map<String, String> _sexualTeasers = {
-    'very_high':
-        '{n1} ve {n2} arasında fiziksel çekim enerjisi son derece güçlü. '
+    'very_high': '{n1} ve {n2} arasında fiziksel çekim enerjisi son derece güçlü. '
         'Ortak pin kodunda Ateş elementi belirgin biçimde öne çıkıyor — '
         'bu, ikili arasındaki fiziksel uyumun ve tutkunun doğal bir yansıması. '
         'Bu enerji doğru beslendiğinde ilişkiye sürekli canlılık katıyor.',
-
-    'high':
-        '{n1} ve {n2} arasında güçlü bir fiziksel çekim enerjisi var. '
+    'high': '{n1} ve {n2} arasında güçlü bir fiziksel çekim enerjisi var. '
         'Ateş elementi ve baskın enerji bir arada — bu ilişkide tutku, '
         'spontanlık ve fiziksel bağlantı önemli bir yer tutuyor. '
         'Bu enerjiyi hem birbirinizi keşfetmek hem de ilişkiyi beslemek için kullanabilirsiniz.',
-
     'high_moderate':
         '{n1} ve {n2} arasında sıcak ve istekli bir fiziksel bağlantı var. '
-        'Ortak kodunuzdaki Ateş enerjisi ikinizi birbirine yaklaştırıyor; '
-        'bu ilişkide fiziksel yakınlık hem rahatlatıcı hem de heyecan verici.',
-
-    'emotional_deep':
-        '{n1} ve {n2} arasındaki fiziksel bağ duyguyla iç içe. '
+            'Ortak kodunuzdaki Ateş enerjisi ikinizi birbirine yaklaştırıyor; '
+            'bu ilişkide fiziksel yakınlık hem rahatlatıcı hem de heyecan verici.',
+    'emotional_deep': '{n1} ve {n2} arasındaki fiziksel bağ duyguyla iç içe. '
         'Su elementinin güçlü oluşu, fiziksel yakınlığın duygusal derinlikle '
         'birleştiğini gösteriyor. Bu bağda güven ve duygusal açıklık, '
         'fiziksel uyumu doğal olarak güçlendiriyor.',
-
     'intellectual':
         '{n1} ve {n2} arasındaki fiziksel çekim zihinsel bağlantıyla besleniyor. '
-        'Hava elementinin öne çıkması, fiziksel uyumun iletişim ve anlayışla '
-        'derinleştiğini gösteriyor. Birbirinizle konuşmak, birbirinize yakın hissetmenin en güçlü yolu.',
-
+            'Hava elementinin öne çıkması, fiziksel uyumun iletişim ve anlayışla '
+            'derinleştiğini gösteriyor. Birbirinizle konuşmak, birbirinize yakın hissetmenin en güçlü yolu.',
     'moderate_warm':
         '{n1} ve {n2} arasında sıcak ve dengeli bir fiziksel bağlantı var. '
-        'Ateş ve Su elementlerinin bir araya gelmesi, tutku ile duygusallığın '
-        'iç içe geçtiğini gösteriyor — bu ilişkide fiziksel yakınlık zaman içinde derinleşiyor.',
-
-    'harmonious':
-        '{n1} ve {n2} arasındaki fiziksel bağlantı dengeli ve uyumlu. '
+            'Ateş ve Su elementlerinin bir araya gelmesi, tutku ile duygusallığın '
+            'iç içe geçtiğini gösteriyor — bu ilişkide fiziksel yakınlık zaman içinde derinleşiyor.',
+    'harmonious': '{n1} ve {n2} arasındaki fiziksel bağlantı dengeli ve uyumlu. '
         'Ortak kodunuz, güven ve istikrarın fiziksel uyumun temelini oluşturduğunu '
         'gösteriyor. Birlikte büyüdükçe bu bağ da güçleniyor.',
   };
@@ -538,7 +493,8 @@ class MockAnalysisData {
     final h9 = combined[8];
 
     final base = _combinedBaseByDigit[h1] ?? _combinedBaseByDigit[1]!;
-    final potential = _combinedPotentialByDigit[h5] ?? _combinedPotentialByDigit[1]!;
+    final potential =
+        _combinedPotentialByDigit[h5] ?? _combinedPotentialByDigit[1]!;
     final essence = _combinedEssenceByDigit[h9] ?? _combinedEssenceByDigit[1]!;
 
     return '$name1 ve $name2\'nın ortak enerjisi $base $potential $essence';
@@ -636,7 +592,8 @@ class MockAnalysisData {
   ];
 
   static String getWeeklyTheme(DateTime date) {
-    final weekIndex = ((date.month - 1) + (date.day ~/ 7)) % weeklyThemes.length;
+    final weekIndex =
+        ((date.month - 1) + (date.day ~/ 7)) % weeklyThemes.length;
     return weeklyThemes[weekIndex];
   }
 

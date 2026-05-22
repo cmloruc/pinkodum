@@ -88,7 +88,7 @@ class _PremiumResultScreenState extends State<PremiumResultScreen> {
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Icon(Icons.star,
+                              Icon(Icons.star,
                                   size: 13, color: AppColors.background),
                               const SizedBox(width: 6),
                               Text(
@@ -108,7 +108,8 @@ class _PremiumResultScreenState extends State<PremiumResultScreen> {
                       const SizedBox(height: 20),
 
                       // ── Pin Kodu Şablonu ─────────────────────────────────
-                      _SectionTitle('Pin Kodun', Icons.grid_view_outlined),
+                      const _SectionTitle(
+                          'Pin Kodun', Icons.grid_view_outlined),
                       const SizedBox(height: 10),
                       Container(
                         decoration: BoxDecoration(
@@ -135,7 +136,8 @@ class _PremiumResultScreenState extends State<PremiumResultScreen> {
                       const SizedBox(height: 20),
 
                       // ── 9 Hane Yorumu ────────────────────────────────────
-                      _SectionTitle('9 Hane Yorumların', Icons.layers_outlined),
+                      const _SectionTitle(
+                          '9 Hane Yorumların', Icons.layers_outlined),
                       const SizedBox(height: 10),
                       _HaneCard(
                           hane: 'H1',
@@ -188,7 +190,7 @@ class _PremiumResultScreenState extends State<PremiumResultScreen> {
                       const SizedBox(height: 20),
 
                       // ── Element Dağılım Tablosu ──────────────────────────
-                      _SectionTitle('Element Haritanın Anlamı',
+                      const _SectionTitle('Element Haritanın Anlamı',
                           Icons.auto_awesome_mosaic_outlined),
                       const SizedBox(height: 10),
                       _ElementTable(pinCode: analysis.pinCode),
@@ -201,7 +203,8 @@ class _PremiumResultScreenState extends State<PremiumResultScreen> {
                       const SizedBox(height: 16),
 
                       // ── Yaşam Dersi ──────────────────────────────────────
-                      _SectionTitle('Yaşam Dersin', Icons.school_outlined),
+                      const _SectionTitle(
+                          'Yaşam Dersin', Icons.school_outlined),
                       const SizedBox(height: 10),
                       _DetailCard(
                         icon: Icons.lightbulb_outline,
@@ -223,7 +226,7 @@ class _PremiumResultScreenState extends State<PremiumResultScreen> {
 
                       Center(
                         child: TextButton.icon(
-                          icon: const Icon(Icons.refresh,
+                          icon: Icon(Icons.refresh,
                               size: 16, color: AppColors.textMuted),
                           label: Text('Yeni Analiz',
                               style: AppTextStyles.bodyMedium),
@@ -257,7 +260,7 @@ class _PremiumAppBar extends StatelessWidget {
       child: Row(
         children: [
           IconButton(
-            icon: const Icon(Icons.arrow_back_ios_new,
+            icon: Icon(Icons.arrow_back_ios_new,
                 size: 18, color: AppColors.textPrimary),
             onPressed: () => context.pop(),
           ),
@@ -267,13 +270,13 @@ class _PremiumAppBar extends StatelessWidget {
                 textAlign: TextAlign.center),
           ),
           sharing
-              ? const SizedBox(
+              ? SizedBox(
                   width: 20,
                   height: 20,
                   child: CircularProgressIndicator(
                       strokeWidth: 2, color: AppColors.gold))
               : IconButton(
-                  icon: const Icon(Icons.picture_as_pdf_outlined,
+                  icon: Icon(Icons.picture_as_pdf_outlined,
                       size: 20, color: AppColors.gold),
                   onPressed: onShare,
                   tooltip: 'PDF Rapor'),
@@ -315,7 +318,7 @@ class _SummaryCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(Icons.auto_awesome, size: 16, color: AppColors.gold),
+              Icon(Icons.auto_awesome, size: 16, color: AppColors.gold),
               const SizedBox(width: 8),
               Text('Genel Özet',
                   style: AppTextStyles.labelMedium
@@ -450,15 +453,15 @@ class _ElementTable extends StatelessWidget {
   final List<int> pinCode;
   const _ElementTable({required this.pinCode});
 
-  static const _elementColors = {
-    'Hava': Color(0xFF60A5FA),
-    'Su': Color(0xFF38BDF8),
-    'Ateş': Color(0xFFF97316),
-    'Toprak': Color(0xFF84CC16),
-    'Denge': Color(0xFFD4AF37),
+  static final _elementColors = {
+    'Hava': const Color(0xFF60A5FA),
+    'Su': const Color(0xFF38BDF8),
+    'Ateş': const Color(0xFFF97316),
+    'Toprak': const Color(0xFF84CC16),
+    'Denge': const Color(0xFFD4AF37),
   };
 
-  static const _elementIcons = {
+  static final _elementIcons = {
     'Hava': Icons.air,
     'Su': Icons.water_drop_outlined,
     'Ateş': Icons.local_fire_department_outlined,
@@ -509,9 +512,9 @@ class _ElementTable extends StatelessWidget {
           // ── Haneden elemente dönüşüm tablosu ──
           Table(
             columnWidths: const {
-              0: FlexColumnWidth(1.2),
-              1: FlexColumnWidth(0.6),
-              2: FlexColumnWidth(1.4),
+              0: const FlexColumnWidth(1.2),
+              1: const FlexColumnWidth(0.6),
+              2: const FlexColumnWidth(1.4),
             },
             children: [
               // Başlık satırı
@@ -572,7 +575,7 @@ class _ElementTable extends StatelessWidget {
               }),
             ],
           ),
-          const Divider(color: AppColors.border, height: 20),
+          Divider(color: AppColors.border, height: 20),
           // ── Element toplamları progress barları ──
           ...elements.map((el) {
             final color = _elementColors[el.$1] ?? AppColors.gold;
@@ -605,7 +608,7 @@ class _ElementTable extends StatelessWidget {
               ]),
             );
           }),
-          const Divider(color: AppColors.border, height: 20),
+          Divider(color: AppColors.border, height: 20),
           Row(children: [
             Expanded(
                 child: _SChip(

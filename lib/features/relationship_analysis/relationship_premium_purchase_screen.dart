@@ -89,7 +89,7 @@ class _RelationshipPremiumPurchaseScreenState
                 child: Row(
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.arrow_back_ios_new,
+                      icon: Icon(Icons.arrow_back_ios_new,
                           size: 18, color: AppColors.textPrimary),
                       onPressed: () => context.pop(),
                     ),
@@ -143,7 +143,7 @@ class _RelationshipPremiumPurchaseScreenState
 class _WhatYouGet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    const items = [
+    final items = [
       (
         Icons.favorite_outline,
         'İlişki Enerjisi',
@@ -188,7 +188,7 @@ class _WhatYouGet extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(Icons.star, size: 15, color: AppColors.purpleLight),
+              Icon(Icons.star, size: 15, color: AppColors.purpleLight),
               const SizedBox(width: 8),
               Text('Detaylı Analizde Neler Var?',
                   style: AppTextStyles.titleMedium
@@ -269,14 +269,13 @@ class _PriceCard extends StatelessWidget {
           children: [
             Text(
               'Detaylı İlişki Analizi',
-              style: AppTextStyles.titleLarge.copyWith(
-                  color: Colors.white, fontWeight: FontWeight.bold),
+              style: AppTextStyles.titleLarge
+                  .copyWith(color: Colors.white, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 6),
             Text(
               '${kCreditsPerRelationshipPremium} Kredi',
-              style:
-                  AppTextStyles.displayMedium.copyWith(color: Colors.white),
+              style: AppTextStyles.displayMedium.copyWith(color: Colors.white),
             ),
             const SizedBox(height: 16),
             Container(
@@ -284,13 +283,12 @@ class _PriceCard extends StatelessWidget {
               decoration: BoxDecoration(
                 color: Colors.white.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(12),
-                border:
-                    Border.all(color: Colors.white.withValues(alpha: 0.3)),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.3)),
               ),
               child: Text(
                 'Analizi Aç',
-                style: AppTextStyles.titleLarge.copyWith(
-                    color: Colors.white, fontWeight: FontWeight.bold),
+                style: AppTextStyles.titleLarge
+                    .copyWith(color: Colors.white, fontWeight: FontWeight.bold),
               ),
             ),
             const SizedBox(height: 10),

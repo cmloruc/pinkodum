@@ -85,7 +85,8 @@ class AdminService {
 
   Future<AdminStats> getStats() async {
     final res = await http
-        .get(Uri.parse('${AppConfig.backendBaseUrl}/admin/stats'), headers: _headers)
+        .get(Uri.parse('${AppConfig.backendBaseUrl}/admin/stats'),
+            headers: _headers)
         .timeout(const Duration(seconds: 15));
     if (res.statusCode != 200) throw Exception('İstatistikler alınamadı.');
     return AdminStats.fromJson(jsonDecode(res.body) as Map<String, dynamic>);
@@ -93,11 +94,14 @@ class AdminService {
 
   Future<List<AdminUser>> getUsers() async {
     final res = await http
-        .get(Uri.parse('${AppConfig.backendBaseUrl}/admin/users'), headers: _headers)
+        .get(Uri.parse('${AppConfig.backendBaseUrl}/admin/users'),
+            headers: _headers)
         .timeout(const Duration(seconds: 15));
     if (res.statusCode != 200) throw Exception('Kullanıcılar alınamadı.');
     final list = jsonDecode(res.body) as List<dynamic>;
-    return list.map((e) => AdminUser.fromJson(e as Map<String, dynamic>)).toList();
+    return list
+        .map((e) => AdminUser.fromJson(e as Map<String, dynamic>))
+        .toList();
   }
 
   Future<void> setCredits(String userId, int credits) async {
@@ -113,7 +117,8 @@ class AdminService {
 
   Future<AiConfig> getAiConfig() async {
     final res = await http
-        .get(Uri.parse('${AppConfig.backendBaseUrl}/admin/ai-config'), headers: _headers)
+        .get(Uri.parse('${AppConfig.backendBaseUrl}/admin/ai-config'),
+            headers: _headers)
         .timeout(const Duration(seconds: 15));
     if (res.statusCode != 200) throw Exception('AI config alınamadı.');
     return AiConfig.fromJson(jsonDecode(res.body) as Map<String, dynamic>);
@@ -137,30 +142,39 @@ class AdminService {
           body: jsonEncode({'activate': activate}),
         )
         .timeout(const Duration(seconds: 15));
-    if (res.statusCode != 200) throw Exception('Premium durumu güncellenemedi.');
+    if (res.statusCode != 200)
+      throw Exception('Premium durumu güncellenemedi.');
   }
 
   Future<List<AdminFeedback>> getFeedbacks() async {
     final res = await http
-        .get(Uri.parse('${AppConfig.backendBaseUrl}/feedback'), headers: _headers)
+        .get(Uri.parse('${AppConfig.backendBaseUrl}/feedback'),
+            headers: _headers)
         .timeout(const Duration(seconds: 15));
     if (res.statusCode != 200) throw Exception('Geri bildirimler alınamadı.');
     final list = jsonDecode(res.body) as List<dynamic>;
-    return list.map((e) => AdminFeedback.fromJson(e as Map<String, dynamic>)).toList();
+    return list
+        .map((e) => AdminFeedback.fromJson(e as Map<String, dynamic>))
+        .toList();
   }
 
   Future<void> markFeedbackRead(String id) async {
     await http
-        .patch(Uri.parse('${AppConfig.backendBaseUrl}/feedback/$id/read'), headers: _headers)
+        .patch(Uri.parse('${AppConfig.backendBaseUrl}/feedback/$id/read'),
+            headers: _headers)
         .timeout(const Duration(seconds: 10));
   }
 
-  Future<BroadcastResult> sendBroadcast(String title, String message) async {
+  Future<BroadcastResult> sendBroadcast(
+    String title,
+    String message, {
+    required String type,
+  }) async {
     final res = await http
         .post(
           Uri.parse('${AppConfig.backendBaseUrl}/admin/push/broadcast'),
           headers: _headers,
-          body: jsonEncode({'title': title, 'message': message}),
+          body: jsonEncode({'title': title, 'message': message, 'type': type}),
         )
         .timeout(const Duration(seconds: 30));
     if (res.statusCode != 201) throw Exception('Bildirim gönderilemedi.');
@@ -171,12 +185,17 @@ class AdminService {
     );
   }
 
-  Future<AiConfig> setAiConfig(String provider, String model, {String? apiKey}) async {
+  Future<AiConfig> setAiConfig(String provider, String model,
+      {String? apiKey}) async {
     final res = await http
         .patch(
           Uri.parse('${AppConfig.backendBaseUrl}/admin/ai-config'),
           headers: _headers,
-          body: jsonEncode({'provider': provider, 'model': model, if (apiKey != null) 'apiKey': apiKey}),
+          body: jsonEncode({
+            'provider': provider,
+            'model': model,
+            if (apiKey != null) 'apiKey': apiKey
+          }),
         )
         .timeout(const Duration(seconds: 15));
     if (res.statusCode != 200) throw Exception('AI config güncellenemedi.');
@@ -221,10 +240,14 @@ class AdminFeedback {
 
   String get typeLabel {
     switch (type) {
-      case 'dilek': return 'Dilek';
-      case 'sikayet': return 'Şikayet';
-      case 'talep': return 'Talep';
-      default: return 'Diğer';
+      case 'dilek':
+        return 'Dilek';
+      case 'sikayet':
+        return 'Şikayet';
+      case 'talep':
+        return 'Talep';
+      default:
+        return 'Diğer';
     }
   }
 }
@@ -234,7 +257,10 @@ class AiConfig {
   final String model;
   final String apiKeyMasked;
 
-  const AiConfig({required this.provider, required this.model, required this.apiKeyMasked});
+  const AiConfig(
+      {required this.provider,
+      required this.model,
+      required this.apiKeyMasked});
 
   factory AiConfig.fromJson(Map<String, dynamic> json) => AiConfig(
         provider: json['provider'] as String,

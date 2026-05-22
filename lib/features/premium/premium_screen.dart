@@ -148,7 +148,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.check_circle, size: 52, color: AppColors.success),
+            Icon(Icons.check_circle, size: 52, color: AppColors.success),
             const SizedBox(height: 16),
             Text('Satın Alma Başarılı!', style: AppTextStyles.headlineMedium),
             const SizedBox(height: 8),
@@ -181,7 +181,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(gradient: AppColors.backgroundGradient),
+        decoration: BoxDecoration(gradient: AppColors.backgroundGradient),
         child: SafeArea(
           child: Column(
             children: [
@@ -190,7 +190,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
                 child: Row(
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.arrow_back_ios_new,
+                      icon: Icon(Icons.arrow_back_ios_new,
                           size: 18, color: AppColors.textPrimary),
                       onPressed: () => context.pop(),
                     ),
@@ -205,7 +205,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
               ),
               Expanded(
                 child: _loading
-                    ? const Center(
+                    ? Center(
                         child: CircularProgressIndicator(color: AppColors.gold))
                     : SingleChildScrollView(
                         padding: const EdgeInsets.all(20),
@@ -248,7 +248,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Icon(Icons.info_outline, color: AppColors.gold),
+              Icon(Icons.info_outline, color: AppColors.gold),
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
@@ -269,8 +269,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
           padding: const EdgeInsets.all(16),
           child: Row(
             children: [
-              const Icon(Icons.warning_amber_outlined,
-                  color: AppColors.warning),
+              Icon(Icons.warning_amber_outlined, color: AppColors.warning),
               const SizedBox(width: 12),
               Expanded(
                 child: Text('App Store şu an kullanılamıyor.',
@@ -331,7 +330,7 @@ class _PremiumHeader extends StatelessWidget {
                   color: AppColors.gold.withValues(alpha: 0.3), blurRadius: 24)
             ],
           ),
-          child: const Icon(Icons.star, size: 36, color: AppColors.background),
+          child: Icon(Icons.star, size: 36, color: AppColors.background),
         ),
         const SizedBox(height: 20),
         Text(AppStrings.premiumTitle, style: AppTextStyles.displayMedium),
@@ -350,8 +349,7 @@ class _PremiumHeader extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.toll_outlined,
-                    size: 18, color: AppColors.gold),
+                Icon(Icons.toll_outlined, size: 18, color: AppColors.gold),
                 const SizedBox(width: 8),
                 Text('$credits kredi',
                     style: AppTextStyles.titleMedium
@@ -385,7 +383,7 @@ class _LoginGate extends StatelessWidget {
       borderColor: AppColors.gold.withValues(alpha: 0.2),
       child: Column(
         children: [
-          const Icon(Icons.lock_outline, size: 40, color: AppColors.gold),
+          Icon(Icons.lock_outline, size: 40, color: AppColors.gold),
           const SizedBox(height: 16),
           Text('Giriş Gerekli', style: AppTextStyles.headlineMedium),
           const SizedBox(height: 8),
@@ -433,14 +431,13 @@ class _CreditPackageCard extends StatelessWidget {
           Container(
             width: 52,
             height: 52,
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               shape: BoxShape.circle,
               gradient: AppColors.goldGradient,
             ),
             child: Center(
               child: isSubscription
-                  ? const Icon(Icons.workspace_premium,
-                      color: AppColors.background)
+                  ? Icon(Icons.workspace_premium, color: AppColors.background)
                   : Text('$credits',
                       style: AppTextStyles.titleLarge
                           .copyWith(color: AppColors.background)),
@@ -459,7 +456,7 @@ class _CreditPackageCard extends StatelessWidget {
           ),
           const SizedBox(width: 12),
           loading
-              ? const SizedBox(
+              ? SizedBox(
                   width: 24,
                   height: 24,
                   child: CircularProgressIndicator(
@@ -478,7 +475,7 @@ class _CreditPackageCard extends StatelessWidget {
                       decoration: BoxDecoration(
                         gradient: onTap != null
                             ? AppColors.goldGradient
-                            : const LinearGradient(colors: [
+                            : LinearGradient(colors: [
                                 AppColors.textMuted,
                                 AppColors.textMuted
                               ]),

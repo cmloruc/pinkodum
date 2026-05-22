@@ -38,13 +38,13 @@ class ElementBalanceCard extends StatelessWidget {
           // Başlık
           Row(
             children: [
-              const Icon(Icons.auto_awesome_mosaic_outlined,
+              Icon(Icons.auto_awesome_mosaic_outlined,
                   size: 16, color: AppColors.gold),
               const SizedBox(width: 8),
               Text(
                 'Element Haritan',
-                style: AppTextStyles.labelMedium
-                    .copyWith(color: AppColors.gold),
+                style:
+                    AppTextStyles.labelMedium.copyWith(color: AppColors.gold),
               ),
             ],
           ),
@@ -111,8 +111,7 @@ class ElementBalanceCard extends StatelessWidget {
             decoration: BoxDecoration(
               color: AppColors.gold.withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                  color: AppColors.gold.withValues(alpha: 0.12)),
+              border: Border.all(color: AppColors.gold.withValues(alpha: 0.12)),
             ),
             child: Text(insight, style: AppTextStyles.bodyLarge),
           ),
@@ -165,7 +164,7 @@ class RelationshipElementCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(Icons.auto_awesome_mosaic_outlined,
+              Icon(Icons.auto_awesome_mosaic_outlined,
                   size: 16, color: AppColors.purpleLight),
               const SizedBox(width: 8),
               Text(
@@ -217,8 +216,8 @@ class RelationshipElementCard extends StatelessWidget {
             decoration: BoxDecoration(
               color: AppColors.purple.withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                  color: AppColors.purple.withValues(alpha: 0.15)),
+              border:
+                  Border.all(color: AppColors.purple.withValues(alpha: 0.15)),
             ),
             child: Text(insight, style: AppTextStyles.bodyLarge),
           ),
@@ -252,8 +251,7 @@ class _Badge extends StatelessWidget {
       decoration: BoxDecoration(
         color: color.withValues(alpha: dim ? 0.05 : 0.1),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-            color: color.withValues(alpha: dim ? 0.15 : 0.3)),
+        border: Border.all(color: color.withValues(alpha: dim ? 0.15 : 0.3)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -285,29 +283,40 @@ class _ElementBars extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final total = balance.air + balance.water + balance.fire +
-        balance.earth + balance.balanceNine;
+    final total = balance.air +
+        balance.water +
+        balance.fire +
+        balance.earth +
+        balance.balanceNine;
     return Column(
       children: [
         _Bar('Hava', balance.air, total,
-            _elementColor(ElementBalanceCalculator.elementAir),
-            Icons.air),
+            _elementColor(ElementBalanceCalculator.elementAir), Icons.air),
         const SizedBox(height: 6),
-        _Bar('Su', balance.water, total,
+        _Bar(
+            'Su',
+            balance.water,
+            total,
             _elementColor(ElementBalanceCalculator.elementWater),
             Icons.water_drop_outlined),
         const SizedBox(height: 6),
-        _Bar('Ateş', balance.fire, total,
+        _Bar(
+            'Ateş',
+            balance.fire,
+            total,
             _elementColor(ElementBalanceCalculator.elementFire),
             Icons.local_fire_department_outlined),
         const SizedBox(height: 6),
-        _Bar('Toprak', balance.earth, total,
+        _Bar(
+            'Toprak',
+            balance.earth,
+            total,
             _elementColor(ElementBalanceCalculator.elementEarth),
             Icons.landscape_outlined),
         if (balance.balanceNine > 0) ...[
           const SizedBox(height: 6),
-          _Bar('Denge / 9', balance.balanceNine, total,
-              AppColors.gold, Icons.balance),
+          _Bar('Denge / 9', balance.balanceNine, total, AppColors.gold,
+              Icons.balance),
         ],
       ],
     );
@@ -333,8 +342,7 @@ class _Bar extends StatelessWidget {
         SizedBox(
           width: 52,
           child: Text(label,
-              style:
-                  AppTextStyles.bodySmall.copyWith(fontSize: 11)),
+              style: AppTextStyles.bodySmall.copyWith(fontSize: 11)),
         ),
         Expanded(
           child: ClipRRect(
@@ -410,19 +418,17 @@ class _PersonElementSummary extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(name,
-              style: AppTextStyles.bodySmall.copyWith(
-                  fontWeight: FontWeight.w600, fontSize: 11),
+              style: AppTextStyles.bodySmall
+                  .copyWith(fontWeight: FontWeight.w600, fontSize: 11),
               maxLines: 1,
               overflow: TextOverflow.ellipsis),
           const SizedBox(height: 6),
           Row(
             children: [
-              Icon(_elementIcon(e.dominantElement),
-                  size: 12, color: color),
+              Icon(_elementIcon(e.dominantElement), size: 12, color: color),
               const SizedBox(width: 4),
               Text(e.dominantElement,
-                  style:
-                      AppTextStyles.bodySmall.copyWith(color: color)),
+                  style: AppTextStyles.bodySmall.copyWith(color: color)),
             ],
           ),
           const SizedBox(height: 2),

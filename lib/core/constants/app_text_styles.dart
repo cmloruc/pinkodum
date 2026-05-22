@@ -5,32 +5,32 @@ import 'app_colors.dart';
 class AppTextStyles {
   AppTextStyles._();
 
-  static TextStyle get displayLarge => GoogleFonts.cinzel(
+  static TextStyle get displayLarge => GoogleFonts.playfairDisplay(
         fontSize: 32,
-        fontWeight: FontWeight.bold,
+        fontWeight: FontWeight.w600,
         color: AppColors.textGold,
-        letterSpacing: 1.5,
+        letterSpacing: 0,
       );
 
-  static TextStyle get displayMedium => GoogleFonts.cinzel(
+  static TextStyle get displayMedium => GoogleFonts.playfairDisplay(
         fontSize: 24,
         fontWeight: FontWeight.w600,
         color: AppColors.textGold,
-        letterSpacing: 1.2,
+        letterSpacing: 0,
       );
 
-  static TextStyle get headlineLarge => GoogleFonts.cinzel(
+  static TextStyle get headlineLarge => GoogleFonts.playfairDisplay(
         fontSize: 20,
         fontWeight: FontWeight.w600,
         color: AppColors.textPrimary,
-        letterSpacing: 0.8,
+        letterSpacing: 0,
       );
 
-  static TextStyle get headlineMedium => GoogleFonts.cinzel(
+  static TextStyle get headlineMedium => GoogleFonts.playfairDisplay(
         fontSize: 17,
         fontWeight: FontWeight.w500,
         color: AppColors.textPrimary,
-        letterSpacing: 0.5,
+        letterSpacing: 0,
       );
 
   static TextStyle get titleLarge => GoogleFonts.inter(
@@ -66,39 +66,39 @@ class AppTextStyles {
         height: 1.4,
       );
 
-  static TextStyle get pinDigit => GoogleFonts.cinzel(
+  static TextStyle get pinDigit => GoogleFonts.playfairDisplay(
         fontSize: 28,
         fontWeight: FontWeight.bold,
         color: AppColors.textGold,
-        letterSpacing: 2,
+        letterSpacing: 0,
       );
 
-  static TextStyle get pinDigitSmall => GoogleFonts.cinzel(
+  static TextStyle get pinDigitSmall => GoogleFonts.playfairDisplay(
         fontSize: 18,
         fontWeight: FontWeight.w600,
         color: AppColors.textGold,
-        letterSpacing: 1.5,
+        letterSpacing: 0,
       );
 
   static TextStyle get labelMedium => GoogleFonts.inter(
         fontSize: 12,
         fontWeight: FontWeight.w500,
         color: AppColors.textMuted,
-        letterSpacing: 0.8,
+        letterSpacing: 0,
       );
 
   static TextStyle get buttonText => GoogleFonts.inter(
         fontSize: 16,
         fontWeight: FontWeight.w600,
-        color: AppColors.background,
-        letterSpacing: 0.5,
+        color: AppColors.onAction,
+        letterSpacing: 0,
       );
 
   static TextStyle get buttonTextSecondary => GoogleFonts.inter(
         fontSize: 16,
         fontWeight: FontWeight.w600,
         color: AppColors.textGold,
-        letterSpacing: 0.5,
+        letterSpacing: 0,
       );
 
   static TextStyle get disclaimer => GoogleFonts.inter(

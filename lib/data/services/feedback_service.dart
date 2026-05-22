@@ -21,14 +21,16 @@ class FeedbackService {
     final token = auth.token;
     if (token == null) throw Exception('Giriş yapmanız gerekiyor.');
 
-    final res = await http.post(
-      Uri.parse('${AppConfig.backendBaseUrl}/feedback'),
-      headers: {
-        'content-type': 'application/json',
-        'authorization': 'Bearer $token',
-      },
-      body: jsonEncode({'type': type, 'message': message}),
-    ).timeout(const Duration(seconds: 10));
+    final res = await http
+        .post(
+          Uri.parse('${AppConfig.backendBaseUrl}/feedback'),
+          headers: {
+            'content-type': 'application/json',
+            'authorization': 'Bearer $token',
+          },
+          body: jsonEncode({'type': type, 'message': message}),
+        )
+        .timeout(const Duration(seconds: 10));
 
     if (res.statusCode != 200 && res.statusCode != 201) {
       throw Exception('Geri bildirim gönderilemedi.');

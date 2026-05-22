@@ -29,13 +29,28 @@ class GradientCard extends StatelessWidget {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: gradientColors ??
-                [AppColors.surfaceLight, AppColors.cardBackground],
+                [
+                  AppColors.surfaceLight.withValues(alpha: 0.76),
+                  AppColors.cardBackground.withValues(alpha: 0.94),
+                ],
           ),
           borderRadius: BorderRadius.circular(borderRadius),
           border: Border.all(
-            color: borderColor ?? AppColors.border,
-            width: 0.5,
+            color: borderColor ?? AppColors.border.withValues(alpha: 0.86),
+            width: 0.8,
           ),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.purple.withValues(alpha: 0.08),
+              blurRadius: 20,
+              offset: const Offset(0, 12),
+            ),
+            BoxShadow(
+              color: AppColors.gold.withValues(alpha: 0.04),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
         padding: padding ?? const EdgeInsets.all(16),
         child: child,

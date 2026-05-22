@@ -57,7 +57,8 @@ class _InsightsScreenState extends State<InsightsScreen> {
       try {
         final user = await auth.fetchMe() ?? auth.currentUser;
         hasInsightAccess = user?.hasDailyInsightAccess ?? false;
-        isPremiumOrAdmin = (user?.hasActivePremium ?? false) || (user?.isAdmin ?? false);
+        isPremiumOrAdmin =
+            (user?.hasActivePremium ?? false) || (user?.isAdmin ?? false);
         final repo = await getRepository();
         final premiumAnalyses = await repo.getPremiumAnalyses();
         final standardAnalyses = await repo.getPersonAnalyses();
@@ -110,8 +111,15 @@ class _InsightsScreenState extends State<InsightsScreen> {
             elementBalance: balance,
             focusText: focusText,
           );
-          weekly = _service.getPersonalWeeklyTheme(balance);
-          affirmation = _service.getPersonalAffirmation(name, balance);
+          weekly = _service.getPersonalWeeklyTheme(
+            date: today,
+            elementBalance: balance,
+          );
+          affirmation = _service.getPersonalAffirmation(
+            name: name,
+            date: today,
+            elementBalance: balance,
+          );
           hasPersonalInsight = true;
         }
       } catch (e) {
@@ -167,7 +175,7 @@ class _InsightsScreenState extends State<InsightsScreen> {
 
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(gradient: AppColors.backgroundGradient),
+        decoration: BoxDecoration(gradient: AppColors.backgroundGradient),
         child: SafeArea(
           child: Column(
             children: [
@@ -176,7 +184,7 @@ class _InsightsScreenState extends State<InsightsScreen> {
                 child: Row(
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.arrow_back_ios_new,
+                      icon: Icon(Icons.arrow_back_ios_new,
                           size: 18, color: AppColors.textPrimary),
                       onPressed: () => context.pop(),
                     ),
@@ -191,7 +199,7 @@ class _InsightsScreenState extends State<InsightsScreen> {
               ),
               Expanded(
                 child: _loading
-                    ? const Center(
+                    ? Center(
                         child: CircularProgressIndicator(color: AppColors.gold),
                       )
                     : SingleChildScrollView(
@@ -200,7 +208,9 @@ class _InsightsScreenState extends State<InsightsScreen> {
                           children: [
                             // Gün bilgisi
                             _DateBadge(date: today),
-                            const SizedBox(height: 20),
+                            const SizedBox(height: 16),
+                            _AffirmationCard(text: _affirmation ?? ''),
+                            const SizedBox(height: 16),
                             _InsightModeCard(
                               isLoggedIn: _isLoggedIn,
                               hasPersonalInsight: _hasPersonalInsight,
@@ -242,8 +252,6 @@ class _InsightsScreenState extends State<InsightsScreen> {
                                     AppColors.purple.withValues(alpha: 0.2),
                               ),
                               const SizedBox(height: 16),
-                              _AffirmationCard(text: _affirmation ?? ''),
-                              const SizedBox(height: 16),
                             ] else ...[
                               _InsightAccessCard(
                                 isLoggedIn: _isLoggedIn,
@@ -275,7 +283,7 @@ class _DateBadge extends StatelessWidget {
   final DateTime date;
   const _DateBadge({required this.date});
 
-  static const _months = [
+  static final _months = [
     '',
     'Ocak',
     'Şubat',
@@ -490,7 +498,7 @@ class _InsightAccessCard extends StatelessWidget {
       padding: const EdgeInsets.all(20),
       child: Column(
         children: [
-          const Icon(Icons.lock_outline, size: 34, color: AppColors.gold),
+          Icon(Icons.lock_outline, size: 34, color: AppColors.gold),
           const SizedBox(height: 12),
           Text('Günlük içgörü premiumlara özel',
               style: AppTextStyles.titleMedium),
@@ -516,7 +524,7 @@ class _InsightAccessCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: unlocking
-                        ? const SizedBox(
+                        ? SizedBox(
                             width: 18,
                             height: 18,
                             child: CircularProgressIndicator(
@@ -622,7 +630,7 @@ class _PremiumTeaser extends StatelessWidget {
           children: [
             Row(
               children: [
-                const Icon(Icons.lock_outline, size: 16, color: AppColors.gold),
+                Icon(Icons.lock_outline, size: 16, color: AppColors.gold),
                 const SizedBox(width: 8),
                 Text(
                   AppStrings.insightPremiumTeaser,

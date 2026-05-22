@@ -27,8 +27,10 @@ class InsightService {
     final weakMessage = _weakElementMessage(elementBalance.weakestElement);
     final energyMessage = _energyMessage(elementBalance.energyType);
     final focus = (focusText ?? '').trim();
+    final dailyPulse = getDailyInsight(date);
 
     return [
+      'Bugünün ritmi: $dailyPulse',
       '$name, $birthDateText doğum tarihinden çıkan pin haritanda bugün $dayDigit enerjisi öne çıkıyor. $elementMessage',
       energyMessage,
       weakMessage,
@@ -36,19 +38,28 @@ class InsightService {
     ].join(' ');
   }
 
-  String getPersonalWeeklyTheme(ElementBalance elementBalance) {
-    return 'Bu hafta odağın: ${elementBalance.dominantElement} enerjini dengeli kullanmak ve ${elementBalance.weakestElement} tarafına bilinçli alan açmak.';
+  String getPersonalWeeklyTheme({
+    required DateTime date,
+    required ElementBalance elementBalance,
+  }) {
+    final weeklyTheme = getWeeklyTheme(date);
+    return '$weeklyTheme. Pin haritana göre ${elementBalance.dominantElement} enerjini dengeli kullanırken ${elementBalance.weakestElement} tarafına bilinçli alan aç.';
   }
 
-  String getPersonalAffirmation(String name, ElementBalance elementBalance) {
-    switch (elementBalance.energyType) {
-      case 'Baskın':
-        return '$name, gücümü sakinlikle yönlendiriyorum.';
-      case 'Edilgen':
-        return '$name, kendi sesime alan açıyor ve ihtiyaçlarımı net ifade ediyorum.';
-      default:
-        return '$name, içimdeki dengeye güveniyorum.';
-    }
+  String getPersonalAffirmation({
+    required String name,
+    required DateTime date,
+    required ElementBalance elementBalance,
+  }) {
+    final affirmation = getAffirmation(date);
+    final personalAnchor = switch (elementBalance.energyType) {
+      'Baskın' => 'Gücümü sakinlikle yönlendiriyorum.',
+      'Edilgen' =>
+        'Kendi sesime alan açıyor ve ihtiyaçlarımı net ifade ediyorum.',
+      _ => 'İçimdeki dengeye güveniyorum.',
+    };
+
+    return '$name, $affirmation $personalAnchor';
   }
 
   String _elementMessage(String element) {

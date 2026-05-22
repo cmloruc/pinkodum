@@ -27,7 +27,7 @@ class _RelationshipPremiumLoadingScreenState
   late Animation<double> _pulse;
   int _messageIndex = 0;
 
-  static const _messages = [
+  static final _messages = [
     'İki enerji bir araya getiriliyor...',
     'Ortak pin kodu yorumlanıyor...',
     'Element uyumu analiz ediliyor...',
@@ -186,7 +186,7 @@ class _RelationshipPremiumLoadingScreenState
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Icon(Icons.info_outline,
+                            Icon(Icons.info_outline,
                                 size: 18, color: AppColors.purpleLight),
                             const SizedBox(width: 10),
                             Expanded(
@@ -206,7 +206,7 @@ class _RelationshipPremiumLoadingScreenState
                         child: LinearProgressIndicator(
                           backgroundColor:
                               AppColors.purple.withValues(alpha: 0.15),
-                          valueColor: const AlwaysStoppedAnimation<Color>(
+                          valueColor: AlwaysStoppedAnimation<Color>(
                               AppColors.purpleLight),
                           minHeight: 2,
                         ),

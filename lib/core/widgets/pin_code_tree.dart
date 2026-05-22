@@ -12,7 +12,7 @@ class PinCodeTree extends StatelessWidget {
 
   const PinCodeTree({super.key, required this.pinCode});
 
-  static const _haneNames = [
+  static final _haneNames = [
     'Kişilik',
     'Sosyal Bilinç',
     'Küresel Bilinçlilik',
@@ -22,19 +22,6 @@ class PinCodeTree extends StatelessWidget {
     'İçsel Çocuk',
     'Ruh Duygusu',
     'Evren',
-  ];
-
-  // Her haneye özgü renk
-  static const _haneColors = [
-    Color(0xFFD4AF37), // H1 — altın
-    Color(0xFF9D5FF0), // H2 — mor
-    Color(0xFF60A5FA), // H3 — mavi
-    Color(0xFF34D399), // H4 — yeşil
-    Color(0xFFF97316), // H5 — turuncu
-    Color(0xFFF472B6), // H6 — pembe
-    Color(0xFFA78BFA), // H7 — lavanta
-    Color(0xFF38BDF8), // H8 — açık mavi
-    Color(0xFFD4AF37), // H9 — altın (özel)
   ];
 
   @override
@@ -48,8 +35,8 @@ class PinCodeTree extends StatelessWidget {
       const totalH = rowH * 3 + rowGap * 2;
 
       // Hane kutularının merkez X koordinatları (bağlantı çizgileri için)
-      final cx = List.generate(
-          5, (i) => i * (colW + gap) + colW / 2); // H1-H5 top row
+      final cx =
+          List.generate(5, (i) => i * (colW + gap) + colW / 2); // H1-H5 top row
 
       // H6 merkezi: col 1 pozisyonu
       final cx6 = colW + gap + colW / 2;
@@ -92,7 +79,7 @@ class PinCodeTree extends StatelessWidget {
                 haneNum: i + 1,
                 digit: pinCode[i],
                 name: _haneNames[i],
-                color: _haneColors[i],
+                color: AppColors.pinDigitColors[i],
               ),
             ),
 
@@ -106,7 +93,7 @@ class PinCodeTree extends StatelessWidget {
               haneNum: 6,
               digit: pinCode[5],
               name: _haneNames[5],
-              color: _haneColors[5],
+              color: AppColors.pinDigitColors[5],
             ),
           ),
           Positioned(
@@ -118,7 +105,7 @@ class PinCodeTree extends StatelessWidget {
               haneNum: 7,
               digit: pinCode[6],
               name: _haneNames[6],
-              color: _haneColors[6],
+              color: AppColors.pinDigitColors[6],
             ),
           ),
 
@@ -132,7 +119,7 @@ class PinCodeTree extends StatelessWidget {
               haneNum: 8,
               digit: pinCode[7],
               name: _haneNames[7],
-              color: _haneColors[7],
+              color: AppColors.pinDigitColors[7],
               wide: true,
             ),
           ),
@@ -145,7 +132,7 @@ class PinCodeTree extends StatelessWidget {
               haneNum: 9,
               digit: pinCode[8],
               name: _haneNames[8],
-              color: _haneColors[8],
+              color: AppColors.pinDigitColors[8],
               wide: true,
               special: true,
             ),
@@ -161,7 +148,7 @@ class _ConnectionPainter extends CustomPainter {
   final double colW, gap, rowH, rowGap;
   final double cx2, cx3, cx6, cx7, cx8, cx9;
 
-  const _ConnectionPainter({
+  _ConnectionPainter({
     required this.colW,
     required this.gap,
     required this.rowH,
@@ -197,7 +184,8 @@ class _ConnectionPainter extends CustomPainter {
     _drawLine(canvas, paint, cx7, row2Bottom, cx8, row3Top);
   }
 
-  void _drawLine(Canvas c, Paint p, double x1, double y1, double x2, double y2) {
+  void _drawLine(
+      Canvas c, Paint p, double x1, double y1, double x2, double y2) {
     c.drawLine(Offset(x1, y1), Offset(x2, y2), p);
   }
 
@@ -263,7 +251,7 @@ class _HaneBox extends StatelessWidget {
           // Rakam
           Text(
             '$digit',
-            style: GoogleFonts.cinzel(
+            style: GoogleFonts.playfairDisplay(
               fontSize: special ? 20 : 16,
               fontWeight: FontWeight.bold,
               color: color,

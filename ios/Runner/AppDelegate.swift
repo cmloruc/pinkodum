@@ -5,6 +5,16 @@ import UserNotifications
 
 @main
 @objc class AppDelegate: FlutterAppDelegate, FlutterImplicitEngineDelegate {
+  static func clearNotificationBadge(_ application: UIApplication) {
+    let center = UNUserNotificationCenter.current()
+    center.removeAllDeliveredNotifications()
+    if #available(iOS 16.0, *) {
+      center.setBadgeCount(0, withCompletionHandler: nil)
+    } else {
+      application.applicationIconBadgeNumber = 0
+    }
+  }
+
   override func application(
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
@@ -40,13 +50,7 @@ import UserNotifications
   }
 
   override func applicationDidBecomeActive(_ application: UIApplication) {
-    let center = UNUserNotificationCenter.current()
-    center.removeAllDeliveredNotifications()
-    if #available(iOS 16.0, *) {
-      center.setBadgeCount(0, withCompletionHandler: nil)
-    } else {
-      application.applicationIconBadgeNumber = 0
-    }
+    AppDelegate.clearNotificationBadge(application)
     super.applicationDidBecomeActive(application)
   }
 }

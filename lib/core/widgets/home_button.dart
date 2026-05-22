@@ -10,7 +10,7 @@ class HomeButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return IconButton(
-      icon: const Icon(Icons.home_outlined, size: 22, color: AppColors.textSecondary),
+      icon: Icon(Icons.home_outlined, size: 22, color: AppColors.textSecondary),
       tooltip: 'Ana Sayfa',
       onPressed: () => context.go(AppRoutes.home),
     );

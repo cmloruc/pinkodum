@@ -336,7 +336,7 @@ class PdfService {
         pw.Container(
           width: 42,
           height: 42,
-          decoration: pw.BoxDecoration(
+          decoration: const pw.BoxDecoration(
             shape: pw.BoxShape.circle,
             color: _gold,
           ),
@@ -854,7 +854,7 @@ class PdfService {
         children: [
           pw.Container(
             padding: const pw.EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-            decoration: pw.BoxDecoration(
+            decoration: const pw.BoxDecoration(
               color: _surface,
               border: pw.Border(left: pw.BorderSide(color: _gold, width: 3)),
             ),

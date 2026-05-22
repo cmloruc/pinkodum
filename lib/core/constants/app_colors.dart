@@ -1,78 +1,61 @@
 import 'package:flutter/material.dart';
+import '../services/theme_service.dart';
 
 class AppColors {
   AppColors._();
 
-  // Ana renkler
-  static const Color background = Color(0xFF0A0E1A);
-  static const Color surface = Color(0xFF111828);
-  static const Color surfaceLight = Color(0xFF1A2236);
-  static const Color cardBackground = Color(0xFF141C2E);
+  static Color get background => ThemeService.instance.current.background;
+  static Color get surface => ThemeService.instance.current.surface;
+  static Color get surfaceLight => ThemeService.instance.current.surfaceLight;
+  static Color get cardBackground =>
+      ThemeService.instance.current.cardBackground;
 
-  // Vurgu renkleri
-  static const Color gold = Color(0xFFD4AF37);
-  static const Color goldLight = Color(0xFFE8C84A);
-  static const Color goldDark = Color(0xFFA88B20);
-  static const Color purple = Color(0xFF7C3AED);
-  static const Color purpleLight = Color(0xFF9D5FF0);
-  static const Color midnightBlue = Color(0xFF1E3A5F);
+  static Color get gold => ThemeService.instance.current.gold;
+  static Color get goldLight => ThemeService.instance.current.goldLight;
+  static Color get goldDark => ThemeService.instance.current.goldDark;
+  static Color get purple => ThemeService.instance.current.purple;
+  static Color get purpleLight => ThemeService.instance.current.purpleLight;
+  static Color get midnightBlue => ThemeService.instance.current.midnightBlue;
+  static Color get action =>
+      ThemeService.instance.current.brightness == Brightness.light
+          ? purple
+          : gold;
+  static Color get actionLight =>
+      ThemeService.instance.current.brightness == Brightness.light
+          ? purpleLight
+          : goldLight;
+  static Color get onAction =>
+      ThemeService.instance.current.brightness == Brightness.light
+          ? Colors.white
+          : background;
 
-  // Gradient'lar
-  static const LinearGradient backgroundGradient = LinearGradient(
-    begin: Alignment.topCenter,
-    end: Alignment.bottomCenter,
-    colors: [Color(0xFF0A0E1A), Color(0xFF0D1520)],
-  );
+  static LinearGradient get backgroundGradient =>
+      ThemeService.instance.current.backgroundGradient;
+  static LinearGradient get goldGradient =>
+      ThemeService.instance.current.goldGradient;
+  static LinearGradient get purpleGradient =>
+      ThemeService.instance.current.purpleGradient;
+  static LinearGradient get actionGradient =>
+      ThemeService.instance.current.brightness == Brightness.light
+          ? purpleGradient
+          : goldGradient;
+  static LinearGradient get cardGradient =>
+      ThemeService.instance.current.cardGradient;
+  static LinearGradient get deepSpaceGradient =>
+      ThemeService.instance.current.deepSpaceGradient;
 
-  static const LinearGradient goldGradient = LinearGradient(
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-    colors: [Color(0xFFE8C84A), Color(0xFFD4AF37), Color(0xFFA88B20)],
-  );
+  static Color get textPrimary => ThemeService.instance.current.textPrimary;
+  static Color get textSecondary => ThemeService.instance.current.textSecondary;
+  static Color get textMuted => ThemeService.instance.current.textMuted;
+  static Color get textGold => ThemeService.instance.current.textGold;
 
-  static const LinearGradient purpleGradient = LinearGradient(
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-    colors: [Color(0xFF9D5FF0), Color(0xFF7C3AED), Color(0xFF5B21B6)],
-  );
+  static Color get success => ThemeService.instance.current.success;
+  static Color get error => ThemeService.instance.current.error;
+  static Color get warning => ThemeService.instance.current.warning;
 
-  static const LinearGradient cardGradient = LinearGradient(
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-    colors: [Color(0xFF1A2236), Color(0xFF141C2E)],
-  );
+  static Color get border => ThemeService.instance.current.border;
+  static Color get borderGold => ThemeService.instance.current.borderGold;
 
-  static const LinearGradient deepSpaceGradient = LinearGradient(
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-    colors: [Color(0xFF0A0E1A), Color(0xFF1E3A5F), Color(0xFF0A0E1A)],
-  );
-
-  // Metin renkleri
-  static const Color textPrimary = Color(0xFFF0EAD6);
-  static const Color textSecondary = Color(0xFFB0A890);
-  static const Color textMuted = Color(0xFF6B7280);
-  static const Color textGold = Color(0xFFD4AF37);
-
-  // Durum renkleri
-  static const Color success = Color(0xFF10B981);
-  static const Color error = Color(0xFFEF4444);
-  static const Color warning = Color(0xFFF59E0B);
-
-  // Kenarlık
-  static const Color border = Color(0xFF2D3748);
-  static const Color borderGold = Color(0xFF5A4A1E);
-
-  // Pin kodu haneleri için renkler
-  static const List<Color> pinDigitColors = [
-    Color(0xFFD4AF37), // 1. hane - altın
-    Color(0xFF9D5FF0), // 2. hane - mor
-    Color(0xFF60A5FA), // 3. hane - mavi
-    Color(0xFF34D399), // 4. hane - yeşil
-    Color(0xFFD4AF37), // 5. hane - altın
-    Color(0xFFF472B6), // 6. hane - pembe
-    Color(0xFF9D5FF0), // 7. hane - mor
-    Color(0xFF60A5FA), // 8. hane - mavi
-    Color(0xFFD4AF37), // 9. hane - altın
-  ];
+  static List<Color> get pinDigitColors =>
+      ThemeService.instance.current.pinDigitColors;
 }

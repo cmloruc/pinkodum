@@ -25,7 +25,7 @@ class _PremiumLoadingScreenState extends State<PremiumLoadingScreen>
   late Animation<double> _pulse;
   int _messageIndex = 0;
 
-  static const _messages = [
+  static final _messages = [
     'Sayıların derinliklerine iniliyor...',
     'Pin kodun analiz ediliyor...',
     'Elementler dengeleniyor...',
@@ -144,7 +144,7 @@ class _PremiumLoadingScreenState extends State<PremiumLoadingScreen>
                               ),
                             ],
                           ),
-                          child: const Icon(
+                          child: Icon(
                             Icons.auto_awesome,
                             size: 52,
                             color: AppColors.background,
@@ -193,7 +193,7 @@ class _PremiumLoadingScreenState extends State<PremiumLoadingScreen>
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Icon(Icons.info_outline,
+                            Icon(Icons.info_outline,
                                 size: 18, color: AppColors.gold),
                             const SizedBox(width: 10),
                             Expanded(
@@ -214,8 +214,8 @@ class _PremiumLoadingScreenState extends State<PremiumLoadingScreen>
                         child: LinearProgressIndicator(
                           backgroundColor:
                               AppColors.gold.withValues(alpha: 0.15),
-                          valueColor: const AlwaysStoppedAnimation<Color>(
-                              AppColors.gold),
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(AppColors.gold),
                           minHeight: 2,
                         ),
                       ),

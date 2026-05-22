@@ -6,6 +6,7 @@ import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_strings.dart';
 import '../../core/constants/app_text_styles.dart';
 import '../../core/widgets/gradient_card.dart';
+import '../../core/widgets/numerology_seal.dart';
 import '../../data/services/auth_service.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -36,7 +37,8 @@ class _HomeScreenState extends State<HomeScreen> {
     final user = AuthService(prefs).currentUser;
     if (!mounted) return;
     setState(() {
-      _showPremiumBanner = !(user?.hasActivePremium ?? false) && !(user?.isAdmin ?? false);
+      _showPremiumBanner =
+          !(user?.hasActivePremium ?? false) && !(user?.isAdmin ?? false);
     });
   }
 
@@ -44,7 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(gradient: AppColors.backgroundGradient),
+        decoration: BoxDecoration(gradient: AppColors.backgroundGradient),
         child: SafeArea(
           child: CustomScrollView(
             slivers: [
@@ -166,43 +168,56 @@ class _HeaderState extends State<_Header> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
-      child: Row(
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 18),
+      child: Column(
         children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Pin Kodum',
-                  style: AppTextStyles.displayMedium,
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Pin Kodum', style: AppTextStyles.displayMedium),
+                    Text(
+                      'NUMEROLOJİ',
+                      style: AppTextStyles.labelMedium.copyWith(
+                        color: AppColors.purpleLight,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  AppStrings.homeSubtitle,
-                  style: AppTextStyles.bodyMedium,
+              ),
+              if (!_loading && _isLoggedIn && !_isAdmin) ...[
+                const SizedBox(width: 12),
+                _CreditBadge(credits: _credits),
+              ] else if (!_loading && !_isLoggedIn) ...[
+                const SizedBox(width: 12),
+                _HeaderAuthButton(
+                  label: 'Giriş',
+                  icon: Icons.login,
+                  onTap: () => _openAuth(AppRoutes.login),
+                ),
+                const SizedBox(width: 8),
+                _HeaderAuthButton(
+                  label: 'Üye Ol',
+                  icon: Icons.person_add_alt_1,
+                  filled: true,
+                  onTap: () => _openAuth(AppRoutes.register),
                 ),
               ],
-            ),
+            ],
           ),
-          if (!_loading && _isLoggedIn && !_isAdmin) ...[
-            const SizedBox(width: 12),
-            _CreditBadge(credits: _credits),
-          ] else if (!_loading && !_isLoggedIn) ...[
-            const SizedBox(width: 12),
-            _HeaderAuthButton(
-              label: 'Giriş',
-              icon: Icons.login,
-              onTap: () => _openAuth(AppRoutes.login),
+          const SizedBox(height: 6),
+          const NumerologySeal(size: 184),
+          Text(
+            AppStrings.homeSubtitle,
+            style: AppTextStyles.bodyMedium.copyWith(
+              color: AppColors.textSecondary,
             ),
-            const SizedBox(width: 8),
-            _HeaderAuthButton(
-              label: 'Üye Ol',
-              icon: Icons.person_add_alt_1,
-              filled: true,
-              onTap: () => _openAuth(AppRoutes.register),
-            ),
-          ],
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 4),
         ],
       ),
     );
@@ -226,7 +241,7 @@ class _CreditBadge extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Icons.toll_outlined, size: 15, color: AppColors.gold),
+          Icon(Icons.toll_outlined, size: 15, color: AppColors.gold),
           const SizedBox(width: 5),
           Text(
             '$credits kredi',
@@ -256,7 +271,7 @@ class _HeaderAuthButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final foreground = filled ? AppColors.background : AppColors.textGold;
+    final foreground = filled ? AppColors.onAction : AppColors.textGold;
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -266,10 +281,10 @@ class _HeaderAuthButton extends StatelessWidget {
           height: 34,
           padding: const EdgeInsets.symmetric(horizontal: 10),
           decoration: BoxDecoration(
-            gradient: filled ? AppColors.goldGradient : null,
+            gradient: filled ? AppColors.actionGradient : null,
             color: filled ? null : AppColors.surface,
             borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: AppColors.gold.withValues(alpha: 0.35)),
+            border: Border.all(color: AppColors.action.withValues(alpha: 0.35)),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -314,15 +329,20 @@ class _FeatureCard extends StatelessWidget {
       gradientColors: gradientColors,
       borderColor: borderColor,
       onTap: onTap,
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 17),
       child: Row(
         children: [
           Container(
-            width: 48,
-            height: 48,
+            width: 54,
+            height: 54,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: AppColors.surfaceLight,
+              gradient: RadialGradient(
+                colors: [
+                  (borderColor ?? AppColors.purple).withValues(alpha: 0.2),
+                  AppColors.surfaceLight.withValues(alpha: 0.72),
+                ],
+              ),
               border: Border.all(
                   color: borderColor ?? AppColors.border, width: 0.5),
             ),
@@ -339,7 +359,7 @@ class _FeatureCard extends StatelessWidget {
               ],
             ),
           ),
-          const Icon(
+          Icon(
             Icons.chevron_right,
             color: AppColors.textMuted,
             size: 20,
@@ -373,7 +393,7 @@ class _PremiumBanner extends StatelessWidget {
         padding: const EdgeInsets.all(20),
         child: Row(
           children: [
-            const Icon(Icons.star, size: 28, color: AppColors.background),
+            Icon(Icons.star, size: 28, color: AppColors.background),
             const SizedBox(width: 16),
             Expanded(
               child: Column(
@@ -394,8 +414,7 @@ class _PremiumBanner extends StatelessWidget {
                 ],
               ),
             ),
-            const Icon(Icons.chevron_right,
-                color: AppColors.background, size: 20),
+            Icon(Icons.chevron_right, color: AppColors.background, size: 20),
           ],
         ),
       ),
@@ -407,7 +426,7 @@ class _BottomNav extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: AppColors.surface,
         border: Border(top: BorderSide(color: AppColors.border, width: 0.5)),
       ),
